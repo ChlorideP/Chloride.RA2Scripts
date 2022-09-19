@@ -44,7 +44,7 @@
             }
         }
 
-        public string ToString(bool space = false)
+        public string ToString(string delimiterPairing)
         {
             if (!IsPair)
             {
@@ -53,7 +53,7 @@
             }
             else
             {
-                var ret = $"{Key}{(space ? " = " : "=")}{Value}";
+                var ret = $"{Key}{delimiterPairing}{Value}";
                 if (!string.IsNullOrEmpty(Comment))
                     ret += $" ;{Comment}";
                 return ret;

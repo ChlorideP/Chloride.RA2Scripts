@@ -1,7 +1,4 @@
 ﻿using System.Collections;
-using System.ComponentModel;
-using System.Linq;
-using System.Net.Http.Headers;
 
 namespace Chloride.CCINIExt
 {
@@ -35,8 +32,7 @@ namespace Chloride.CCINIExt
         {
             get
             {
-                IniItem i;
-                if (!(ContainsKey(key, out i) && (Parent?.ContainsKey(key, out i) ?? false)))
+                if (!(ContainsKey(key, out IniItem i) && (Parent?.ContainsKey(key, out i) ?? false)))
                     throw new KeyNotFoundException(key);
                 return i.Value;
             }
@@ -64,8 +60,7 @@ namespace Chloride.CCINIExt
         public bool Remove(IniItem item) => items.Remove(item);
         public bool RemoveKey(string key)
         {
-            IniItem item;
-            if (ContainsKey(key, out item))
+            if (ContainsKey(key, out IniItem item))
                 return items.Remove(item);
             else if (Parent?.ContainsKey(key, out _) ?? false)
                 Add(key, string.Empty);
@@ -76,8 +71,7 @@ namespace Chloride.CCINIExt
         public void Add(IniItem item) => items.Add(item);
         public void Add(string key, IniValue value, string? desc = null)
         {
-            IniItem item;
-            if (ContainsKey(key, out item))
+            if (ContainsKey(key, out IniItem item))
             {
                 item.Value = value;
                 item.Comment = desc;
@@ -87,8 +81,7 @@ namespace Chloride.CCINIExt
         }
         public void Add<T>(string key, T value, string? desc = null) where T : notnull
         {
-            IniItem item;
-            if (ContainsKey(key, out item))
+            if (ContainsKey(key, out IniItem item))
             {
                 item.Value = value.ToString();
                 item.Comment = desc;
@@ -116,8 +109,7 @@ namespace Chloride.CCINIExt
 
         public string GetValue(string key)
         {
-            IniItem iKey;
-            if (ContainsKey(key, out iKey) || (Parent?.ContainsKey(key, out iKey) ?? false))
+            if (ContainsKey(key, out IniItem iKey) || (Parent?.ContainsKey(key, out iKey) ?? false))
                 return iKey.Value.ToString();
             else
                 return string.Empty;
@@ -168,12 +160,6 @@ namespace Chloride.CCINIExt
             return ret;
         }
 
-        public int CompareTo(IniSection? other)
-        {
-            if (other == null)
-                return -1;
-            else
-                return Name.CompareTo(other.Name);
-        }
+        public int CompareTo(IniSection? other) => Name.CompareTo(other?.Name);
     }
 }

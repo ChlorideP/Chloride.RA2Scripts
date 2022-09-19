@@ -16,20 +16,19 @@ namespace Chloride.CCINIExt
 
         public IniSection this[string sec]
         {
-            get => Raw[IndexOfSection(sec)];
+            get => Raw[IndexOf(sec)];
             set
             {
                 value.Name = sec; // this["ssks"] = new("ddtms")? NO FXXKING WAY
 
-                var hs = IndexOfSection(sec);
-                if (hs != -1)
-                    Raw[hs] = value;
+                if (HasSection(sec, out int idx))
+                    Raw[idx] = value;
                 else
                     Raw.Add(value);
             }
         }
 
-        public int IndexOfSection(string section)
+        private int IndexOf(string section)
         {
             foreach (var i in Raw)
             {
@@ -38,44 +37,36 @@ namespace Chloride.CCINIExt
             }
             return -1;
         }
-        public bool HasKey(string section, string key)
-        {
-            var hs = IndexOfSection(section);
-            return hs != -1 && Raw[hs].ContainsKey(key, out _);
-        }
+
+        public bool HasSection(string section, out int index) => (index = IndexOf(section)) != -1;
+        public bool HasKey(string section, string key) => HasSection(section, out int idx) && Raw[idx].ContainsKey(key, out _);
 
         // wouldn't replace the old one.
         public void AddNew(string sect)
         {
-            if (IndexOfSection(sect) != -1)
+            if (IndexOf(sect) != -1)
                 return;
             Raw.Add(new(sect));
         }
         public void Remove(string sect)
         {
-            var hs = IndexOfSection(sect);
-            if (hs == -1)
+            if (HasSection(sect, out int idx))
                 return;
-            Raw.RemoveAt(hs);
+            Raw.RemoveAt(idx);
         }
         public void Rename(string _old, string _new)
         {
-            if (_old == _new || IndexOfSection(_new) != -1)
+            if (_old == _new || IndexOf(_new) != -1)
                 throw new ArgumentException($"Section {_new} already exists");
-            Raw[IndexOfSection(_old)].Name = _new;
+            Raw[IndexOf(_old)].Name = _new;
         }
 
-        public IniValue GetValue(string sect, string key) 
-            => HasKey(sect, key) ? Raw[IndexOfSection(sect)][key] : null;
-        public string[] GetTypeList(string sect)
-        {
-            var hs = IndexOfSection(sect);
-            return hs != -1 ? Raw[hs].Values().Select(i => i.ToString()).ToArray() : Array.Empty<string>();
-        }
+        public IniValue GetValue(string sect, string key) => HasKey(sect, key) ? Raw[IndexOf(sect)][key] : null;
+        public string[] GetTypeList(string sect) => HasSection(sect, out int i) ? Raw[i].Values().Select(i => i.ToString()).ToArray() : Array.Empty<string>();
         public void SetValue<T>(string sect, string key, T value) where T : notnull
         {
             AddNew(sect);
-            Raw[IndexOfSection(sect)][key] = value.ToString();
+            Raw[IndexOf(sect)][key] = value.ToString();
         }
 
         public void Clear() => Raw.Clear();
@@ -104,9 +95,11 @@ namespace Chloride.CCINIExt
                 }
             }
         }
-        public virtual void Save(string dest, string codec = "utf-8", bool space = false)
+        public virtual void Save(FileInfo dest, string codec = "utf-8", bool space = false)
         {
-            using var fs = new FileInfo(dest).Open(FileMode.Create, FileAccess.Write, FileShare.Read);
+            var eq = space ? " = " : "=";
+
+            using var fs = dest.Open(FileMode.Create, FileAccess.Write, FileShare.Read);
             {
                 var sw = new StreamWriter(fs, Encoding.GetEncoding(codec));
                 foreach (var i in Header)
@@ -115,7 +108,7 @@ namespace Chloride.CCINIExt
                 {
                     sw.WriteLine(i.ToString());
                     foreach (var j in i)
-                        sw.WriteLine(j.ToString(space));
+                        sw.WriteLine(j.ToString(eq));
                 }
                 sw.Flush();
             }

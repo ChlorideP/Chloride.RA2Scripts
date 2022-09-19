@@ -32,14 +32,14 @@ Ares 提供了类似丢弃`_`的注册方式，即`+= ABC`。
 ### 类 & 方法声明
 ```c#
 namespace Chloride.CCINIExt {
+    // 父类有的我就不写了= =
     public class Ini : IEnumerable<IniSection> {
         // 初始化为空 ini
         public Ini();
         // 此法添加的 IniSection 会覆盖已有的
         public IniSection this[string sec] { get; set; }
 
-        // 获取节下标，可以 != -1 判是否存在
-        public int IndexOfSection(string section);
+        public bool HasSection(string section, out int index);
         public bool HasKey(string section, string key);
 
         // 已有同名小节不再添加
@@ -61,18 +61,17 @@ namespace Chloride.CCINIExt {
         // 读 ini，自动扫描编码
         public void Load(FileInfo[] paths);
         // 读 ini，手动指定编码
-        public void Load(FileInfo[] paths);
+        public void Load(FileInfo[] paths, string encoding = "utf-8");
         // 保存 ini 到指定路径，默认用 UTF-8 编码，键值间的等号不带空格。
-        public void Save(string dest, string codec = "utf-8", bool space = false)
+        public virtual void Save(FileInfo dest, string codec = "utf-8", bool space = false)
     }
 
     public class CCIni : Ini {
         public CCIni(FileInfo ini, string encoding = "utf-8");
         // 默认路径为初始化读的 ini 路径，默认编码是初始化时的编码。
-        public new void Save(string? dest = null, string? codec = null, bool space = false);
+        public new void Save(FileInfo? dest = null, string? codec = null, bool space = false);
     }
 
-    // 父类有的我就不写了= =
     public class IniSection : IList<IniItem>, IComparable<IniSection> {
         public string Name; // 节名称
         public IniSection? Parent; // 父小节，当前文件没有但是确实继承了用空实例，实在没有用null.
@@ -109,7 +108,7 @@ namespace Chloride.CCINIExt {
         public IniItem(string? key, string? val, string? desc = null);
         public IniItem(string key, IniValue value, string? desc = null);
 
-        public string ToString(bool space = false);
+        public string ToString(string delimiterPairing);
     }
 
     public struct IniValue {

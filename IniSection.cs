@@ -36,7 +36,7 @@ namespace Chloride.CCINIExt
             get
             {
                 IniItem i;
-                if (!ContainsKey(key, out i))
+                if (!(ContainsKey(key, out i) && (Parent?.ContainsKey(key, out i) ?? false)))
                     throw new KeyNotFoundException(key);
                 return i.Value;
             }
@@ -46,7 +46,7 @@ namespace Chloride.CCINIExt
         public IEnumerator<IniItem> GetEnumerator() => items.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();
 
-        public void Concat<T>(IDictionary<string, T> source)
+        public void Concat<T>(IDictionary<string, T> source) where T : notnull
         {
             foreach (var item in source)
                 items.Add(new(
@@ -58,7 +58,7 @@ namespace Chloride.CCINIExt
         public int IndexOf(IniItem item) => items.IndexOf(item);
 
         public void Insert(int line, IniItem item) => items.Insert(line, item);
-        public void Insert<T>(int line, string key, T value)
+        public void Insert<T>(int line, string key, T value) where T : notnull
             => items.Insert(line, new(key, value?.ToString()));
 
         public bool Remove(IniItem item) => items.Remove(item);
@@ -67,8 +67,9 @@ namespace Chloride.CCINIExt
             IniItem item;
             if (ContainsKey(key, out item))
                 return items.Remove(item);
-            else
-                return false;
+            else if (Parent?.ContainsKey(key, out _) ?? false)
+                Add(key, string.Empty);
+            return false;
         }
         public void RemoveAt(int line) => items.RemoveAt(line);
 
@@ -84,16 +85,16 @@ namespace Chloride.CCINIExt
             else
                 Add(new(key, value, desc));
         }
-        public void Add<T>(string key, T value, string? desc = null)
+        public void Add<T>(string key, T value, string? desc = null) where T : notnull
         {
             IniItem item;
             if (ContainsKey(key, out item))
             {
-                item.Value = value?.ToString();
+                item.Value = value.ToString();
                 item.Comment = desc;
             }
             else
-                Add(new(key, value?.ToString(), desc));
+                Add(new(key, value.ToString(), desc));
         }
 
         public void Clear() => items.Clear();
@@ -109,15 +110,14 @@ namespace Chloride.CCINIExt
                     return true;
                 }
             }
-            // unique comment to avoid conflict of "Empty Line" and "null".
-            item = new(null, null, DateTime.Now.ToString());
-            return false;
+            item = default;
+            return Parent?.ContainsKey(key, out item) ?? false;
         }
 
         public string GetValue(string key)
         {
             IniItem iKey;
-            if (ContainsKey(key, out iKey))
+            if (ContainsKey(key, out iKey) || (Parent?.ContainsKey(key, out iKey) ?? false))
                 return iKey.Value.ToString();
             else
                 return string.Empty;

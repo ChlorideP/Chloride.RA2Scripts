@@ -71,10 +71,10 @@ namespace Chloride.CCINIExt
             var hs = GetSectionIndex(sect);
             return hs != -1 ? Raw[hs].Values().Select(i => i.ToString()).ToArray() : Array.Empty<string>();
         }
-        public void SetValue<T>(string sect, string key, T value)
+        public void SetValue<T>(string sect, string key, T value) where T : notnull
         {
             AddNew(sect);
-            Raw[GetSectionIndex(sect)][key] = value?.ToString();
+            Raw[GetSectionIndex(sect)][key] = value.ToString();
         }
 
         public void Clear() => Raw.Clear();

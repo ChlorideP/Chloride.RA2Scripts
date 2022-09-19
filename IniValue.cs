@@ -6,7 +6,7 @@ namespace Chloride.CCINIExt
     {
         internal string raw;
 
-        public IniValue(string? s) => raw = (s is null ? string.Empty : s);
+        public IniValue(string? s) => raw = s ?? string.Empty;
         public IniValue() => raw = string.Empty;
 
         public string[] TrySplit()

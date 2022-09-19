@@ -32,14 +32,14 @@ Ares 提供了类似丢弃`_`的注册方式，即`+= ABC`。
 ### 类 & 方法声明
 ```c#
 namespace Chloride.CCINIExt {
-    public class Ini {
+    public class Ini : IEnumerable<IniSection> {
         // 初始化为空 ini
         public Ini();
         // 此法添加的 IniSection 会覆盖已有的
         public IniSection this[string sec] { get; set; }
 
         // 获取节下标，可以 != -1 判是否存在
-        public int GetSectionIndex(string section);
+        public int IndexOfSection(string section);
         public bool HasKey(string section, string key);
 
         // 已有同名小节不再添加

@@ -23,7 +23,7 @@ namespace Chloride.CCINIExt
 
         public override string ToString() => Path.GetFileName(filePath);
 
-        public new void Save(string? dest = null, string? codec = null, bool space = false)
+        public override void Save(string? dest = null, string? codec = null, bool space = false)
         {
             if (string.IsNullOrEmpty(codec))
                 codec = this.codec;

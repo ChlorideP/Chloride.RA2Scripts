@@ -44,15 +44,13 @@ namespace Chloride.CCINIExt
         // wouldn't replace the old one.
         public void AddNew(string sect)
         {
-            if (IndexOf(sect) != -1)
-                return;
-            Raw.Add(new(sect));
+            if (!HasSection(sect, out _))
+                Raw.Add(new(sect));
         }
         public void Remove(string sect)
         {
             if (HasSection(sect, out int idx))
-                return;
-            Raw.RemoveAt(idx);
+                Raw.RemoveAt(idx);
         }
         public void Rename(string _old, string _new)
         {

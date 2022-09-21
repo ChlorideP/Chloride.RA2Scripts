@@ -160,11 +160,14 @@ namespace Chloride.CCINIExt
                             Raw[cur].Add(new(null, null, i[(i.IndexOf(';') + 1)..].TrimEnd()));
                         break;
                     default:
-                        var spDesc = i.Split(';', 2);
-                        var spPair = spDesc[0].Split('=', 2).Select(i => i.Trim()).ToArray();
-                        if (spPair[0] == "+")
-                            spPair[0] = $"+{diff++}";
-                        Raw[cur].Add(spPair[0], spPair[1], spDesc.Length > 1 ? spDesc[1] : null);
+                        if (i.Contains('='))
+                        {
+                            var spDesc = i.Split(';', 2);
+                            var spPair = spDesc[0].Split('=', 2).Select(i => i.Trim()).ToArray();
+                            if (spPair[0] == "+")
+                                spPair[0] = $"+{diff++}";
+                            Raw[cur].Add(spPair[0], spPair[1], spDesc.Length > 1 ? spDesc[1] : null);
+                        }
                         break;
                 }
             }

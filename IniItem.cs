@@ -1,6 +1,6 @@
 ﻿namespace Chloride.CCINIExt
 {
-    public struct IniItem
+    public class IniItem
     {
         public string? Key;
         public IniValue Value;
@@ -12,20 +12,20 @@
 
         public IniItem() // empty line
         {
-            Key = Comment = string.Empty;
+            Key = Comment = null;
             Value = new();
         }
-        public IniItem(string? key, string? val, string? desc = null) // anything not null
-        {
-            Key = key;
-            Value = val;
-            Comment = desc;
-        }
-        public IniItem(string key, IniValue value, string? desc = null) // must be key-val pair
+        public IniItem(string? key, IniValue value, string? desc = null)
         {
             Key = key;
             Value = value;
             Comment = desc;
+        }
+        public IniItem(KeyValuePair<string, IniValue> pair)
+        {
+            Key = pair.Key;
+            Value = pair.Value;
+            Comment = null;
         }
 
         public override string ToString()

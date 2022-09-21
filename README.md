@@ -49,7 +49,7 @@ namespace Chloride.CCINIExt {
 
         public IniValue GetValue(string sect, string key);
         public string[] GetTypeList(string sect);
-        public void SetValue<T>(string sect, string key, T value) where T : notnull;
+        public void SetValue(string sect, string key, IniValue value);
 
         public void Clear();
         // 默认按字母序重排小节顺序
@@ -63,13 +63,13 @@ namespace Chloride.CCINIExt {
         // 读 ini，手动指定编码
         public void Load(FileInfo[] paths, string encoding = "utf-8");
         // 保存 ini 到指定路径，默认用 UTF-8 编码，键值间的等号不带空格。
-        public virtual void Save(FileInfo dest, string codec = "utf-8", bool space = false)
+        public virtual void Save(FileInfo dest, string codec = "utf-8", bool space = false);
     }
 
     public class CCIni : Ini {
         public CCIni(FileInfo ini, string encoding = "utf-8");
         // 默认路径为初始化读的 ini 路径，默认编码是初始化时的编码。
-        public new void Save(FileInfo? dest = null, string? codec = null, bool space = false);
+        public override void Save(FileInfo? dest = null, string? codec = null, bool space = false);
     }
 
     public class IniSection : IList<IniItem>, IComparable<IniSection> {
@@ -78,20 +78,19 @@ namespace Chloride.CCINIExt {
         public string? Description; // 节注释，就是挂在 [Section] 右边的注释。
 
         public IniSection(string section, IniSection? super = null, string? desc = null);
-        public IniSection(string section, IDictionary<string, string> source);
+        public IniSection(string section, IDictionary<string, IniValue> source);
         public IniValue this[string key] { get; set; }
 
-        public void Concat<T>(IDictionary<string, T> source) where T : notnull;
-        public void Insert<T>(int line, string key, T value) where T : notnull;
+        public void Insert(int line, string key, IniValue value);
         public bool RemoveKey(string key);
         public void Add(string key, IniValue value, string? desc = null);
-        public void Add<T>(string key, T value, string? desc = null) where T : notnull;
+        public void AddRange(IDictionary<string, IniValue> source);
         public bool ContainsKey(string key, out IniItem item);
         // 找不到就返回空串
         public string GetValue(string key);
 
-        public List<string> Keys();
-        public List<IniValue> Values();
+        public IEnumerable<string> Keys();
+        public IEnumerable<IniValue> Values();
         public Dictionary<string, IniValue> Items();
     }
 
@@ -105,8 +104,8 @@ namespace Chloride.CCINIExt {
         public bool IsNullValue { get; }
 
         public IniItem(); // 初始化空行
-        public IniItem(string? key, string? val, string? desc = null);
         public IniItem(string key, IniValue value, string? desc = null);
+        public IniItem(KeyValuePair<string, IniValue> pair);
 
         public string ToString(string delimiterPairing);
     }

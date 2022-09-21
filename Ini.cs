@@ -61,10 +61,10 @@ namespace Chloride.CCINIExt
 
         public IniValue GetValue(string sect, string key) => HasKey(sect, key) ? Raw[IndexOf(sect)][key] : null;
         public string[] GetTypeList(string sect) => HasSection(sect, out int i) ? Raw[i].Values().Select(i => i.ToString()).ToArray() : Array.Empty<string>();
-        public void SetValue<T>(string sect, string key, T value) where T : notnull
+        public void SetValue(string sect, string key, IniValue value)
         {
             AddNew(sect);
-            Raw[IndexOf(sect)][key] = value.ToString();
+            Raw[IndexOf(sect)][key] = value;
         }
 
         public void Clear() => Raw.Clear();

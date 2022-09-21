@@ -18,10 +18,10 @@ namespace Chloride.CCINIExt
             Parent = super;
             Description = desc;
         }
-        public IniSection(string section, IDictionary<string, string> source) // with source given
+        public IniSection(string section, IDictionary<string, IniValue> source) // with source given
         {
             Name = section;
-            Concat(source);
+            AddRange(source);
         }
 
         public int Count => items.Count;
@@ -42,20 +42,11 @@ namespace Chloride.CCINIExt
         public IEnumerator<IniItem> GetEnumerator() => items.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();
 
-        public void Concat<T>(IDictionary<string, T> source) where T : notnull
-        {
-            foreach (var item in source)
-                items.Add(new(
-                    item.Key,
-                    item.Value?.ToString()
-                ));
-        }
-
         public int IndexOf(IniItem item) => items.IndexOf(item);
 
         public void Insert(int line, IniItem item) => items.Insert(line, item);
-        public void Insert<T>(int line, string key, T value) where T : notnull
-            => items.Insert(line, new(key, value?.ToString()));
+        public void Insert(int line, string key, IniValue value)
+            => items.Insert(line, new(key, value));
 
         public bool Remove(IniItem item) => items.Remove(item);
         public bool RemoveKey(string key)
@@ -71,24 +62,15 @@ namespace Chloride.CCINIExt
         public void Add(IniItem item) => items.Add(item);
         public void Add(string key, IniValue value, string? desc = null)
         {
-            if (ContainsKey(key, out IniItem item))
+            if (!ContainsKey(key, out IniItem item))
             {
-                item.Value = value;
-                item.Comment = desc;
+                item.Key = key;
+                Add(item);
             }
-            else
-                Add(new(key, value, desc));
+            item.Value = value;
+            item.Comment = desc ?? item.Comment;
         }
-        public void Add<T>(string key, T value, string? desc = null) where T : notnull
-        {
-            if (ContainsKey(key, out IniItem item))
-            {
-                item.Value = value.ToString();
-                item.Comment = desc;
-            }
-            else
-                Add(new(key, value.ToString(), desc));
-        }
+        public void AddRange(IDictionary<string, IniValue> source) => items.AddRange(source.Select(i => new IniItem(i)));
 
         public void Clear() => items.Clear();
 
@@ -103,50 +85,19 @@ namespace Chloride.CCINIExt
                     return true;
                 }
             }
-            item = default;
+            item = new(); // reference type couldn't initialize as default
             return Parent?.ContainsKey(key, out item) ?? false;
         }
 
-        public string GetValue(string key)
-        {
-            if (ContainsKey(key, out IniItem iKey) || (Parent?.ContainsKey(key, out iKey) ?? false))
-                return iKey.Value.ToString();
-            else
-                return string.Empty;
-        }
+        public string GetValue(string key) 
+            => ContainsKey(key, out IniItem iKey) || (Parent?.ContainsKey(key, out iKey) ?? false)
+            ? iKey.Value.ToString() : string.Empty;
 
-        public List<string> Keys()
-        {
-            List<string> ret = new();
-            foreach (var i in items)
-            {
-                if (!string.IsNullOrEmpty(i.Key))
-                    ret.Add(i.Key);
-            }
-            return ret;
-        }
+        public IEnumerable<string> Keys() => items.Select(i => i.Key ?? string.Empty).Where(i => !string.IsNullOrEmpty(i));
 
-        public List<IniValue> Values()
-        {
-            List<IniValue> ret = new();
-            foreach (var i in items)
-            {
-                if (!string.IsNullOrEmpty(i.Key))
-                    ret.Add(i.Value);
-            }
-            return ret;
-        }
+        public IEnumerable<IniValue> Values() => items.Where(i => !string.IsNullOrEmpty(i.Key)).Select(i => i.Value);
 
-        public Dictionary<string, IniValue> Items()
-        {
-            Dictionary<string, IniValue> ret = new();
-            foreach (var i in items)
-            {
-                if (!string.IsNullOrEmpty(i.Key))
-                    ret.Add(i.Key, i.Value);
-            }
-            return ret;
-        }
+        public Dictionary<string, IniValue> Items() => items.Where(i => !string.IsNullOrEmpty(i.Key)).ToDictionary(i => i.Key!, i => i.Value);
 
         public void CopyTo(IniItem[] array, int arrayIndex) => items.CopyTo(array, arrayIndex);
 
@@ -155,7 +106,7 @@ namespace Chloride.CCINIExt
             var ret = $"[{Name}]";
             if (Parent != null)
                 ret += $":[{Parent.Name}]";
-            if (Description != null)
+            if (!string.IsNullOrEmpty(Description))
                 ret += $";{Description}";
             return ret;
         }

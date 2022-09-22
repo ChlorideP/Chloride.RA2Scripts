@@ -5,7 +5,7 @@ namespace Chloride.CCINIExt
 {
     public class Ini : IEnumerable<IniSection>
     {
-        private List<IniItem> Header = new();
+        private List<string> Header = new();
 
         /*// no need to make anything linear, sections were just like trees.
         private List<string> sections = new();*/
@@ -127,9 +127,9 @@ namespace Chloride.CCINIExt
                 if (string.IsNullOrEmpty(i))
                 {
                     if (cur == -1)
-                        Header.Add(new(null, null, null));
+                        Header.Add(string.Empty);
                     else
-                        Raw[cur].Add(new(null, null, null));
+                        Raw[cur].Add(new());
                     continue;
                 }
 
@@ -155,7 +155,7 @@ namespace Chloride.CCINIExt
                         break;
                     case ';':
                         if (cur == -1)
-                            Header.Add(new(null, null, i[(i.IndexOf(';') + 1)..].TrimEnd()));
+                            Header.Add(i[(i.IndexOf(';') + 1)..].TrimEnd());
                         else
                             Raw[cur].Add(new(null, null, i[(i.IndexOf(';') + 1)..].TrimEnd()));
                         break;

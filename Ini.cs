@@ -5,7 +5,7 @@ namespace Chloride.CCINIExt
 {
     public class Ini : IEnumerable<IniSection>
     {
-        private List<string> Header = new();
+        private List<string?> Header = new();
 
         /*// no need to make anything linear, sections were just like trees.
         private List<string> sections = new();*/
@@ -115,7 +115,6 @@ namespace Chloride.CCINIExt
         // too Python. needs rewritten.
         {
             int cur, max, diff = 0;
-            var sections = new List<string>();
             if (Raw.Count == 0)
                 cur = max = -1;
             else
@@ -123,8 +122,9 @@ namespace Chloride.CCINIExt
 
             while (!stream.EndOfStream)
             {
-                var i = stream.ReadLine()?.Trim();
-                if (string.IsNullOrEmpty(i))
+                var i = stream.ReadLine();
+                var strip = i?.Trim();
+                if (string.IsNullOrEmpty(strip))
                 {
                     if (cur == -1)
                         Header.Add(string.Empty);
@@ -133,21 +133,18 @@ namespace Chloride.CCINIExt
                     continue;
                 }
 
-                switch (i[0])
+                switch (strip[0])
                 {
                     case '[':
-                        var sect = i.Split(';', 2);
+                        var sect = strip.Split(';', 2);
                         var curSect = sect[0].Split(':', 2).Select(i => i.Trim()[1..^1]).ToArray();
-                        string? curDesc = sect.Length == 2 ? sect[1].TrimEnd() : null;
+                        string? curDesc = sect.Length == 2 ? sect[1] : null;
 
-                        if (sections.Contains(curSect[0]))
-                            cur = sections.IndexOf(curSect[0]);
-                        else
+                        if (!HasSection(curSect[0], out cur))
                         {
-                            sections.Add(curSect[0]);
                             Raw.Add(new(
                                 curSect[0],
-                                (curSect.Length > 1) ? (sections.Contains(curSect[1]) ? Raw[sections.IndexOf(curSect[1])] : new(curSect[1])) : null,
+                                curSect.Length > 1 ? (HasSection(curSect[1], out int iParent) ? Raw[iParent] : new(curSect[1])) : null,
                                 curDesc
                             ));
                             cur = ++max;
@@ -155,18 +152,25 @@ namespace Chloride.CCINIExt
                         break;
                     case ';':
                         if (cur == -1)
-                            Header.Add(i[(i.IndexOf(';') + 1)..].TrimEnd());
+                            Header.Add(i);
                         else
-                            Raw[cur].Add(new(null, null, i[(i.IndexOf(';') + 1)..].TrimEnd()));
+                            Raw[cur].Add(new(i));
                         break;
                     default:
-                        if (i.Contains('='))
+                        if (strip.Contains('='))
                         {
-                            var spDesc = i.Split(';', 2);
-                            var spPair = spDesc[0].Split('=', 2).Select(i => i.Trim()).ToArray();
+                            var spPair = strip.Split('=', 2).ToArray();
+                            var spDesc = spPair[1].Split(';', 2);
+                            var item = new IniItem();
+
                             if (spPair[0] == "+")
                                 spPair[0] = $"+{diff++}";
-                            Raw[cur].Add(spPair[0], spPair[1], spDesc.Length > 1 ? spDesc[1] : null);
+                            item.Key = spPair[0].Trim();
+                            item.Value = spDesc[0].Trim();
+                            item.Comment = (item.Value.IsNull ? spPair[1] : new StringBuilder(spPair[1])
+                                .Replace((string)item.Value, string.Empty, 0, spDesc[0].Length)
+                                .ToString()).TrimEnd();
+                            Raw[cur].Add(item);
                         }
                         break;
                 }

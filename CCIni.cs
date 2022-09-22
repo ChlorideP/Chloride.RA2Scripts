@@ -2,27 +2,26 @@
 {
     public class CCIni : Ini
     {
-        private readonly FileInfo file;
-        private readonly string codec;
+        private readonly FileInfo File;
+        public readonly string Encoding;
 
         public CCIni(FileInfo ini, string encoding = "utf-8") : base()
         {
-            file = ini;
-            codec = encoding;
+            File = ini;
+            Encoding = encoding;
             if (!ini.Exists)
                 throw new FileNotFoundException(ini.FullName);
             Load(new FileInfo[] { ini }, encoding);
         }
 
-        public override string ToString() => file.Name;
+        public override string ToString() => File.Name;
 
         public override void Save(FileInfo? dest = null, string? codec = null, bool space = false)
         {
             if (string.IsNullOrEmpty(codec))
-                codec = this.codec;
-            dest ??= file;
+                codec = Encoding;
 
-            base.Save(dest, codec, space);
+            base.Save(dest ?? File, codec, space);
         }
     }
 }

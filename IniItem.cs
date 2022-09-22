@@ -9,7 +9,7 @@
         public bool IsEmptyLine => !IsPair && string.IsNullOrEmpty(Comment);
         public bool IsPair => !string.IsNullOrEmpty(Key);
 
-        public IniItem(string? desc = null) // empty line
+        public IniItem(string? desc = null) // empty line || description only
         {
             Key = string.Empty;
             Value = new();

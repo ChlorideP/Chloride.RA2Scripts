@@ -18,16 +18,16 @@ Ares 是红色警戒2的扩展平台，它在 ini 方面新增了一些约定：
 
 可以像`[Child]:[Parent]`这样继承一个 Section。
 
-在 Ares 里实质上是做了内存拷贝，而我这边则是链表的思路。无论如何，父小节必须出现在子节之前。
+在 Ares 里实质上是做了内存拷贝，而我这边则是链表的思路。无论如何，父小节必须出现在子节之前。  
 嗯？你说多继承？dbq，Ares 都不支持，我干嘛要做（
 
 - 注册表 Key 允许丢弃
 
-在红警2里，某些类型的实例名称会保存在 ini 里，称为`Type List`，modder习惯叫“注册表”。
-游戏加载时会直接用值表去初始化该类型的数组。
+在红警2里，某些类型的实例名称会保存在 ini 里，称为`Type List`，modder习惯叫“注册表”。  
+Ares 提供了类似丢弃`_`的“注册”方式（即`+= ABC`），以方便追加。
 
-Ares 提供了类似丢弃`_`的注册方式，即`+= ABC`。
-`+=`键值对会在我这里转换为`+%d`的形式，保存出来大概会看到`+0=` `+1=`之类的。
+`+=`键值对会在我这里转换为`+%d`的形式，保存出来大概会看到`+0=` `+1=`之类的。  
+处理不同子ini时可能要注意，注册表的`+=`项有没有因此重复。
 
 ### 类 & 方法声明
 ```c#
@@ -67,8 +67,11 @@ namespace Chloride.CCINIExt {
     }
 
     public class CCIni : Ini {
+        public readonly string Encoding; // 初始化时的编码，由encoding参数指定
+
         public CCIni(FileInfo ini, string encoding = "utf-8");
-        // 默认路径为初始化读的 ini 路径，默认编码是初始化时的编码。
+
+        // 默认路径为初始化读的 ini 路径，默认编码参见 Encoding。
         public override void Save(FileInfo? dest = null, string? codec = null, bool space = false);
     }
 
@@ -81,7 +84,9 @@ namespace Chloride.CCINIExt {
         public IniSection(string section, IDictionary<string, IniValue> source);
         public IniValue this[string key] { get; set; }
 
+        // 插入操作不会检查 Key 唯一性
         public void Insert(int line, string key, IniValue value);
+        // 子节不直接 Remove 父节的 Key，而是置为空值（懒得搞默认值表）
         public bool RemoveKey(string key);
         public void Add(string key, IniValue value, string? desc = null);
         public void AddRange(IDictionary<string, IniValue> source);
@@ -94,19 +99,20 @@ namespace Chloride.CCINIExt {
         public Dictionary<string, IniValue> Items();
     }
 
-    public struct IniItem {
-        public string? Key; // 可null是为了空行跟纯注释
+    public class IniItem {
+        public string Key;
         public IniValue Value;
         public string? Comment;
 
         public bool IsEmptyLine { get; }
         public bool IsPair { get; }
-        public bool IsNullValue { get; }
 
-        public IniItem(); // 初始化空行
+        // 初始化小节里的空行或纯注释行（头部原则上不修改）
+        public IniItem(string? desc = null);
+        // 初始化小节里的键值对
         public IniItem(string key, IniValue value, string? desc = null);
         public IniItem(KeyValuePair<string, IniValue> pair);
-
+        // 允许自定赋值号（其实保存的时候只有"A = B"和"A=B"两种）
         public string ToString(string delimiterPairing);
     }
 

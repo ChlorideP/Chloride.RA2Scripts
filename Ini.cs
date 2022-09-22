@@ -5,6 +5,7 @@ namespace Chloride.CCINIExt
 {
     public class Ini : IEnumerable<IniSection>
     {
+        internal int diff = 0;
         private List<string?> Header = new();
 
         /*// no need to make anything linear, sections were just like trees.
@@ -114,7 +115,7 @@ namespace Chloride.CCINIExt
         private void ParseStream(StreamReader stream)
         // too Python. needs rewritten.
         {
-            int cur, max, diff = 0;
+            int cur, max;
             if (Raw.Count == 0)
                 cur = max = -1;
             else

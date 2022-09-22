@@ -161,15 +161,15 @@ namespace Chloride.CCINIExt
                         {
                             var spPair = strip.Split('=', 2).ToArray();
                             var spDesc = spPair[1].Split(';', 2);
-                            var item = new IniItem();
+                            spPair[0] = spPair[0].Trim();
 
-                            if (spPair[0] == "+")
-                                spPair[0] = $"+{diff++}";
-                            item.Key = spPair[0].Trim();
-                            item.Value = spDesc[0].Trim();
-                            item.Comment = (item.Value.IsNull ? spPair[1] : new StringBuilder(spPair[1])
+                            var item = new IniItem(
+                                spPair[0] == "+" ? $"+{diff++}" : spPair[0],
+                                spDesc[0].Trim()
+                            );
+                            item.Comment = item.Value.IsNull ? spPair[1] : new StringBuilder(spPair[1])
                                 .Replace((string)item.Value, string.Empty, 0, spDesc[0].Length)
-                                .ToString()).TrimEnd();
+                                .ToString();
                             Raw[cur].Add(item);
                         }
                         break;

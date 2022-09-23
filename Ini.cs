@@ -5,19 +5,18 @@ namespace Chloride.CCINIExt
 {
     public class Ini : IEnumerable<IniSection>
     {
+        // when "merging" mutiples into one,
+        // diff shouldn't reset as "+%d=" pair may be replaced.
         internal int diff = 0;
-        private List<string?> Header = new();
 
-        /*// no need to make anything linear, sections were just like trees.
-        private List<string> sections = new();*/
-        // fxxking dictionary just linear !!!!!!!
+        private List<string?> Header = new();
         private List<IniSection> Raw = new();
 
         public Ini() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // To support GB2312.
 
         public IniSection this[string sec]
         {
-            get => Raw[IndexOf(sec)];
+            get => Contains(sec, out IniSection? sect) ? sect! : throw new KeyNotFoundException(sec);
             set
             {
                 value.Name = sec; // this["ssks"] = new("ddtms")? NO FXXKING WAY
@@ -29,6 +28,8 @@ namespace Chloride.CCINIExt
             }
         }
 
+        // the following private methods are just for internal.
+        // won't consider index assignment for users.
         private int IndexOf(string section)
         {
             foreach (var i in Raw)
@@ -38,14 +39,15 @@ namespace Chloride.CCINIExt
             }
             return -1;
         }
+        private bool HasSection(string section, out int index) => (index = IndexOf(section)) != -1;
 
-        public bool HasSection(string section, out int index) => (index = IndexOf(section)) != -1;
-        public bool HasKey(string section, string key) => HasSection(section, out int idx) && Raw[idx].ContainsKey(key, out _);
+        public bool Contains(string section, out IniSection? result) => (result = Raw.LastOrDefault(i => i.Name == section)) != null;
+        public bool ContainsKey(string section, string key) => HasSection(section, out int idx) && Raw[idx].Contains(key, out _);
 
         // wouldn't replace the old one.
         public void AddNew(string sect)
         {
-            if (!HasSection(sect, out _))
+            if (!Contains(sect, out _))
                 Raw.Add(new(sect));
         }
         public void Remove(string sect)
@@ -55,13 +57,16 @@ namespace Chloride.CCINIExt
         }
         public void Rename(string _old, string _new)
         {
-            if (_old == _new || IndexOf(_new) != -1)
-                throw new ArgumentException($"Section {_new} already exists");
-            Raw[IndexOf(_old)].Name = _new;
+            if (Contains(_old, out IniSection? old))
+            {
+                if (_old == _new || IndexOf(_new) != -1)
+                    throw new ArgumentException($"Section {_new} already exists");
+                old!.Name = _new;
+            }
         }
 
-        public IniValue GetValue(string sect, string key) => HasKey(sect, key) ? Raw[IndexOf(sect)][key] : null;
-        public string[] GetTypeList(string sect) => HasSection(sect, out int i) ? Raw[i].Values().Select(i => i.ToString()).ToArray() : Array.Empty<string>();
+        public IniValue GetValue(string sect, string key) => ContainsKey(sect, key) ? Raw[IndexOf(sect)][key] : null;
+        public string[] GetTypeList(string sect) => Contains(sect, out IniSection? ret) ? ret!.Values.Select(i => i.ToString()).ToArray() : Array.Empty<string>();
         public void SetValue(string sect, string key, IniValue value)
         {
             AddNew(sect);

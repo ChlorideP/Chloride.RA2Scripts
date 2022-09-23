@@ -40,12 +40,13 @@ namespace Chloride.CCINIExt {
         // 此法添加的 IniSection 会覆盖已有的
         public IniSection this[string sec] { get; set; }
 
-        public bool HasSection(string section, out int index);
-        public bool HasKey(string section, string key);
+        public bool Contains(string section, out IniSection? result);
+        public bool ContainsKey(string section, string key);
 
         // 已有同名小节不再添加
         public void AddNew(string sect);
         public void Remove(string sect);
+        // _old 不存在时不再试图更名
         public void Rename(string _old, string _new);
 
         public IniValue GetValue(string sect, string key);
@@ -76,28 +77,42 @@ namespace Chloride.CCINIExt {
         public override void Save(FileInfo? dest = null, string? codec = null, bool space = false);
     }
 
-    public class IniSection : IList<IniItem>, IComparable<IniSection> {
+    public class IniSection : IEnumerable<IniItem>, IComparable<IniSection> {
         public string Name; // 节名称
         public IniSection? Parent; // 父小节，当前文件没有但是确实继承了用空实例，实在没有用null.
         public string? Description; // 节注释，就是挂在 [Section] 右边的注释。
 
         public IniSection(string section, IniSection? super = null, string? desc = null);
         public IniSection(string section, IDictionary<string, IniValue> source);
+        public IniValue this[int line] { get; set; }
         public IniValue this[string key] { get; set; }
 
+        public int Count { get; }
+
+        public void Insert(int line, IniItem item);
         // 插入操作不会检查 Key 唯一性
         public void Insert(int line, string key, IniValue value);
+
+        public bool Remove(IniItem item);
         // 子节不直接 Remove 父节的 Key，而是置为空值（懒得搞默认值表）
-        public bool RemoveKey(string key);
+        public bool Remove(string key);
+        public void RemoveAt(int line);
+
+        public void Add(IniItem item);
         public void Add(string key, IniValue value, string? desc = null);
+        public void AddRange(IEnumerable<IniItem> sequence);
         public void AddRange(IDictionary<string, IniValue> source);
-        public bool ContainsKey(string key, out IniItem item);
+
+        public void Clear();
+
+        public bool Contains(string key, out IniItem item);
+
         // 找不到就返回空串
         public string GetValue(string key);
 
-        public IEnumerable<string> Keys();
-        public IEnumerable<IniValue> Values();
-        public Dictionary<string, IniValue> Items();
+        public IEnumerable<string> Keys { get; }
+        public IEnumerable<IniValue> Values { get; }
+        public Dictionary<string, IniValue> Items { get; }
     }
 
     public class IniItem {

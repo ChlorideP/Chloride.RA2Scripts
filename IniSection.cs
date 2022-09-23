@@ -70,6 +70,7 @@ namespace Chloride.CCINIExt
             item.Value = value;
             item.Comment = desc ?? item.Comment;
         }
+        public void AddRange(IEnumerable<IniItem> sequence) => items.AddRange(sequence);
         public void AddRange(IDictionary<string, IniValue> source) => items.AddRange(source.Select(i => new IniItem(i)));
 
         public void Clear() => items.Clear();

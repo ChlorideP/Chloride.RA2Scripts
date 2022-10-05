@@ -41,13 +41,16 @@ namespace Chloride.CCINIExt
         public void Insert(int line, string key, IniValue value) => items.Insert(line, new(key, value));
 
         public bool Remove(IniItem item) => items.Remove(item);
-        public bool Remove(string key)
+        public bool Remove(string key, bool recurse = false)
         {
-            if (Contains(key, out IniItem item))
-                return items.Remove(item);
-            else if (Parent?.Contains(key, out _) ?? false)
+            foreach (var i in items)
+            {
+                if (i.Key == key)
+                    items.Remove(i);
+            }
+            if (recurse && (Parent?.Contains(key, out _) ?? false))
                 Add(key, string.Empty);
-            return false;
+            return !Contains(key, out _);
         }
         public void RemoveAt(int line) => items.RemoveAt(line);
 

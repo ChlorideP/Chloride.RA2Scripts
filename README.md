@@ -94,8 +94,8 @@ namespace Chloride.CCINIExt {
         public void Insert(int line, string key, IniValue value);
 
         public bool Remove(IniItem item);
-        // 子节不直接 Remove 父节的 Key，而是置为空值（懒得搞默认值表）
-        public bool Remove(string key);
+        // recurse: 子节不直接 Remove 父节的 Key，而是置为空值（懒得搞默认值表）
+        public bool Remove(string key, bool recurse = false);
         public void RemoveAt(int line);
 
         public void Add(IniItem item);

@@ -17,6 +17,9 @@ namespace Chloride.CCiniExt
 
         public bool IsNull => string.IsNullOrEmpty(raw);
 
+        public static bool operator ==(IniValue v1, IniValue v2) => v1.raw == v2.raw;
+        public static bool operator !=(IniValue v1, IniValue v2) => v1.raw != v2.raw;
+
         public static explicit operator bool(IniValue value) =>
             value.raw is not null
             && ((new char[] { 'y', 't', '1' }).Contains(char.ToLower(value.raw[0]))

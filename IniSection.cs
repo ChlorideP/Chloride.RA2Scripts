@@ -29,7 +29,7 @@ namespace Chloride.CCiniExt
         public IniItem this[int line] { get => items[line]; set => items[line] = value; }
         public IniValue this[string key]
         {
-            get => !(Contains(key, out IniItem i) && (Parent?.Contains(key, out i) ?? false))
+            get => !(Contains(key, out IniItem i) || (Parent?.Contains(key, out i) ?? false))
                 ? throw new KeyNotFoundException(key) : i.Value;
             set => Add(key, value);
         }

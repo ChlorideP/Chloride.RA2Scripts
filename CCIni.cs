@@ -1,4 +1,4 @@
-﻿namespace Chloride.CCINIExt
+﻿namespace Chloride.CCiniExt
 {
     public class CCIni : Ini
     {

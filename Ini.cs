@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Text;
 
-namespace Chloride.CCINIExt
+namespace Chloride.CCiniExt
 {
     public class Ini : IEnumerable<IniSection>
     {

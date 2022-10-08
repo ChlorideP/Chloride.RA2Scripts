@@ -1,4 +1,4 @@
-# Chloride.CCINIExt
+# Chloride.CCiniExt
 此类库用于处理含注释的 Ares INI，同时是[PyMapRA2](https://github.com/Chloride1/PyMapRA2)项目中`relertpy.ccini`模块的扩展（原本只读键值对嘛）。  
 至于为什么是 C# 类库嘛，只能说 PowerShell 某种意义上比 Python 更自由一点咯。
 
@@ -32,7 +32,7 @@ Ares 提供了类似丢弃`_`的“注册”方式（即`+= ABC`），以方便�
 
 ### 类 & 方法声明
 ```c#
-namespace Chloride.CCINIExt {
+namespace Chloride.CCiniExt {
     // 父类有的我就不写了= =
     public class Ini : IEnumerable<IniSection> {
         // 初始化为空 ini

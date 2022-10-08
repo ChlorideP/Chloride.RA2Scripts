@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace Chloride.CCINIExt
+namespace Chloride.CCiniExt
 {
     // List (x)
     // Dictionary (o)

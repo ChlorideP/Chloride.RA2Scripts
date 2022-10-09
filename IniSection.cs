@@ -43,10 +43,16 @@ namespace Chloride.CCiniExt
         public bool Remove(IniItem item) => items.Remove(item);
         public bool Remove(string key, bool recurse = false)
         {
-            foreach (var i in items)
+            // CAUTION: PYTHON TRICKS NOT WORK IN CSHARP!!!
+            /*foreach (var i in items)
             {
                 if (i.Key == key)
                     items.Remove(i);
+            }*/
+            for (int i = items.Count - 1; i >= 0; i--)
+            {
+                if (items[i].Key == key)
+                    items.RemoveAt(i);
             }
             if (recurse && (Parent?.Contains(key, out _) ?? false))
                 Add(key, string.Empty);

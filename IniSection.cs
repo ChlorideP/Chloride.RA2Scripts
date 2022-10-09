@@ -73,7 +73,7 @@ namespace Chloride.CCiniExt
         public bool Contains(string key, out IniItem item) =>
             (item = items.LastOrDefault(i => i.Key == key) ?? new()).IsPair || (Parent?.Contains(key, out item) ?? false);
 
-        public string GetValue(string key, string fallback = "") => Contains(key, out IniItem iKey) ? iKey.Value.ToString() : fallback;
+        public string? GetValue(string key, string? fallback = null) => Contains(key, out IniItem iKey) ? iKey.Value.ToString() : fallback;
 
         public IEnumerable<string> Keys => items.Select(i => i.Key ?? string.Empty).Where(i => !string.IsNullOrEmpty(i));
 

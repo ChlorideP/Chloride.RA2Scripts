@@ -65,7 +65,6 @@ namespace Chloride.CCiniExt
             }
         }
 
-        public IniValue GetValue(string sect, string key) => ContainsKey(sect, key) ? Raw[IndexOf(sect)][key] : null;
         public string[] GetTypeList(string sect) => Contains(sect, out IniSection? ret) ? ret!.Values.Select(i => i.ToString()).ToArray() : Array.Empty<string>();
         public void SetValue(string sect, string key, IniValue value)
         {

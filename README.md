@@ -49,7 +49,6 @@ namespace Chloride.CCiniExt {
         // _old 不存在时不再试图更名
         public void Rename(string _old, string _new);
 
-        public IniValue GetValue(string sect, string key);
         public string[] GetTypeList(string sect);
         public void SetValue(string sect, string key, IniValue value);
 
@@ -108,7 +107,7 @@ namespace Chloride.CCiniExt {
         public bool Contains(string key, out IniItem item);
 
         // 找不到就返回指定的默认值
-        public string GetValue(string key, string fallback = "");
+        public string? GetValue(string key, string? fallback = null);
 
         public IEnumerable<string> Keys { get; }
         public IEnumerable<IniValue> Values { get; }

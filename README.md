@@ -106,8 +106,8 @@ namespace Chloride.CCiniExt {
 
         public bool Contains(string key, out IniItem item);
 
-        // 找不到就返回指定的默认值
-        public string? GetValue(string key, string? fallback = null);
+        // 找不到就返回null，可以用 ?? 运算符指定 fallback
+        public string? GetValue(string key);
 
         public IEnumerable<string> Keys { get; }
         public IEnumerable<IniValue> Values { get; }

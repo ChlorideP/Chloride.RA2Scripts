@@ -101,6 +101,10 @@ namespace Chloride.CCiniExt {
         public void Add(string key, IniValue value, string? desc = null);
         public void AddRange(IEnumerable<IniItem> sequence);
         public void AddRange(IDictionary<string, IniValue> source);
+        // 此举会将该对象的字段悉数覆盖。
+        /* 由于 C# 没有类指针，为了防止父节更新子节捕获不到，只能将新对象的字段拷贝回自身。 */
+        public void Update(IEnumerable<IniItem> sequence);
+        public void Update(IniSection section);
 
         public void Clear();
 

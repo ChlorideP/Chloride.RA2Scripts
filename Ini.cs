@@ -19,10 +19,10 @@ namespace Chloride.CCiniExt
             get => Contains(sec, out IniSection? sect) ? sect! : throw new KeyNotFoundException(sec);
             set
             {
-                value.Name = sec; // this["ssks"] = new("ddtms")? NO FXXKING WAY
+                value.Name = sec; // assignment should keep correspondence.
 
                 if (HasSection(sec, out int idx))
-                    Raw[idx] = value;
+                    Raw[idx].Update(value);
                 else
                     Raw.Add(value);
             }

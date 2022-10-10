@@ -74,6 +74,16 @@ namespace Chloride.CCiniExt
         public void AddRange(IEnumerable<IniItem> sequence) => items.AddRange(sequence);
         public void AddRange(IDictionary<string, IniValue> source) => items.AddRange(source.Select(i => new IniItem(i)));
 
+        public void Update(IEnumerable<IniItem> sequence) => items = sequence.ToList();
+
+        public void Update(IniSection section)
+        {
+            Name = section.Name;
+            Parent = section.Parent;
+            Description = section.Description;
+            items = section.ToList();
+        }
+
         public void Clear() => items.Clear();
 
         public bool Contains(string key, out IniItem item) =>

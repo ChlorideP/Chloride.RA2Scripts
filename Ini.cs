@@ -19,6 +19,8 @@ namespace Chloride.CCiniExt
             get => Contains(sec, out IniSection? sect) ? sect! : throw new KeyNotFoundException(sec);
             set
             {
+                value.Name = sec; // this["ssks"] = new("ddtms")? NO FXXKING WAY
+
                 if (HasSection(sec, out int idx))
                     Raw[idx] = value;
                 else

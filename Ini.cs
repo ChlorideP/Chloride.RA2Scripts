@@ -76,26 +76,26 @@ namespace Chloride.CCiniExt
         public void Sort() => Raw.Sort((x, y) => x.CompareTo(y));
         public void Sort(IComparer<IniSection>? condExpr) => Raw.Sort(condExpr);
 
-        public void Load(FileInfo[] paths)
+        public void Load(FileInfo iniFile)
         {
-            foreach (var i in paths)
+            if (iniFile.Exists)
             {
-                if (i.Exists)
-                {
-                    using var fs = i.OpenRead();
-                    ParseStream(new StreamReader(fs));
-                }
+                using var fs = iniFile.OpenRead();
+                ParseStream(new StreamReader(fs));
+            } else
+            {
+                throw new FileNotFoundException(iniFile.FullName);
             }
         }
-        public void Load(FileInfo[] paths, string encoding = "utf-8")
+        public void Load(FileInfo iniFile, string encoding = "utf-8")
         {
-            foreach (var i in paths)
+            if (iniFile.Exists)
             {
-                if (i.Exists)
-                {
-                    using var fs = i.OpenRead();
-                    ParseStream(new StreamReader(fs, Encoding.GetEncoding(encoding)));
-                }
+                using var fs = iniFile.OpenRead();
+                ParseStream(new StreamReader(fs, Encoding.GetEncoding(encoding)));
+            } else
+            {
+                throw new FileNotFoundException(iniFile.FullName);
             }
         }
         public virtual void Save(FileInfo dest, string codec = "utf-8", bool space = false)
@@ -120,10 +120,7 @@ namespace Chloride.CCiniExt
         // too Python. needs rewritten.
         {
             int cur, max;
-            if (Raw.Count == 0)
-                cur = max = -1;
-            else
-                cur = max = Raw.Count - 1;
+            cur = max = Raw.Count == 0 ? 0 : Raw.Count - 1;
 
             while (!stream.EndOfStream)
             {

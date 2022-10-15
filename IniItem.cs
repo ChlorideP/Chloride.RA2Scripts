@@ -28,7 +28,6 @@
             Comment = null;
         }
 
-        public override string ToString() => IsPair ? $"{Key}={Value}{Comment}" : $"{Comment}";
-        public string ToString(string delimiterPairing) => IsPair ? $"{Key}{delimiterPairing}{Value}{Comment}" : $"{Comment}";
+        public string ToString(string delimiterPairing = "=") => IsPair ? $"{Key}{delimiterPairing}{Value}{Comment}" : $"{Comment}";
     }
 }

@@ -60,20 +60,11 @@ namespace Chloride.CCiniExt {
 
         /* [#include] 最好是自己实现读取。因为不同mod的情况不同。*/
         // 读 ini，自动扫描编码
-        public void Load(FileInfo[] paths);
+        public void Load(FileInfo iniFile);
         // 读 ini，手动指定编码
-        public void Load(FileInfo[] paths, string encoding = "utf-8");
+        public void Load(FileInfo iniFile, string encoding = "utf-8");
         // 保存 ini 到指定路径，默认用 UTF-8 编码，键值间的等号不带空格。
         public virtual void Save(FileInfo dest, string codec = "utf-8", bool space = false);
-    }
-
-    public class CCIni : Ini {
-        public readonly string Encoding; // 初始化时的编码，由encoding参数指定
-
-        public CCIni(FileInfo ini, string encoding = "utf-8");
-
-        // 默认路径为初始化读的 ini 路径，默认编码参见 Encoding。
-        public override void Save(FileInfo? dest = null, string? codec = null, bool space = false);
     }
 
     public class IniSection : IEnumerable<IniItem>, IComparable<IniSection> {

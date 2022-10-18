@@ -11,13 +11,16 @@ namespace Chloride.CCiniExt
     {
         static IniSerializer() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-        public static void Deserialize(this IniDoc doc, FileInfo ini)
+        public static void Deserialize(this IniDoc doc, params FileInfo[] inis)
         {
-            if (!ini.Exists)
-                throw new FileNotFoundException(ini.FullName);
-            using var fs = ini.OpenRead();
-            using var sr = new StreamReader(fs);
-            Deserialize(doc, sr);
+            foreach (var ini in inis)
+            {
+                if (!ini.Exists)
+                    throw new FileNotFoundException(ini.FullName);
+                using var fs = ini.OpenRead();
+                using var sr = new StreamReader(fs);
+                Deserialize(doc, sr);
+            }
         }
 
         public static void Deserialize(IniDoc doc, TextReader tr)

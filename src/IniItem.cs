@@ -20,7 +20,7 @@
         }
 
         public bool IsPair => !string.IsNullOrEmpty(Key);
-        public bool IsEmptyLine => !IsPair && string.IsNullOrEmpty(Comment);
+        public bool IsEmptyLine => !IsPair && string.IsNullOrWhiteSpace(Comment);
 
         public override string ToString() => ToString(": ");
         public string ToString(string pairLinker = "=") => IsPair ? $"{Key}{pairLinker}{Value}{Comment}" : $"{Comment}";

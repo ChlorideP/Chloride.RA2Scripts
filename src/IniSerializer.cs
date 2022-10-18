@@ -37,7 +37,7 @@ namespace Chloride.CCiniExt
                     if (cur == -1)
                         doc.Head.Add(string.Empty);
                     else
-                        doc.Raw[cur].Add(new());
+                        doc.Raw[cur].Add();
                     continue;
                 }
 
@@ -67,18 +67,15 @@ namespace Chloride.CCiniExt
                     default:
                         if (strip.Contains('='))
                         {
-                            var pair = strip.Split('=', 2).ToArray();
-                            var value = pair[1].Split(';', 2);
-                            pair[0] = pair[0].Trim();
+                            var pair = strip.Split('=', 2);
 
-                            var item = new IniItem(
-                                pair[0] == "+" ? $"+{doc.diff++}" : pair[0],
-                                value[0].Trim()
-                            );
-                            item.Comment = item.Value.IsNull ? pair[1] : new StringBuilder(pair[1])
-                                .Replace((string)item.Value, string.Empty, 0, value[0].Length)
+                            var key = pair[0].Trim();
+                            IniValue val = pair[1].Split(';', 2)[0].Trim();
+                            var desc = val.IsNull ? pair[1] : new StringBuilder(pair[1])
+                                .Replace(val.ToString(), string.Empty, 0, pair[1].IndexOf(';') + 1)
                                 .ToString();
-                            doc.Raw[cur].Add(item);
+
+                            doc.Raw[cur].Add(key, val, desc);
                         }
                         break;
                 }

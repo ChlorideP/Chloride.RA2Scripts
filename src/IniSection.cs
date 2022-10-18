@@ -12,7 +12,7 @@ namespace Chloride.CCiniExt
         {
             get => !(Contains(key, out IniItem i) || (Parent?.Contains(key, out i) ?? false))
                 ? throw new KeyNotFoundException(key) : i.Value;
-            set => Add(new(key, value));
+            set => Add(key, value);
         }
 
         public string Name { get; set; }
@@ -49,7 +49,17 @@ namespace Chloride.CCiniExt
         public IEnumerable<IniValue> Values => items.Where(i => !string.IsNullOrEmpty(i.Key)).Select(i => i.Value);
         public Dictionary<string, IniValue> Items => items.Where(i => !string.IsNullOrEmpty(i.Key)).ToDictionary(i => i.Key, i => i.Value);
 
-        public void Add(IniItem item) => items.Add(item);
+        public void Add(string? desc = null) => items.Add(new(desc));
+        public void Add(string key, IniValue value, string? desc = null)
+        {
+            if (!Contains(key, out IniItem item))
+            {
+                item.Key = key;
+                items.Add(item);
+            }
+            item.Value = value;
+            item.Comment = desc ?? item.Comment;
+        }
         public void AddRange(IEnumerable<IniItem> items) => this.items.AddRange(items);
         public void AddRange(IDictionary<string, IniValue> dict) => items.AddRange(dict.Select(i => new IniItem(i.Key, i.Value)));
         public void Insert(int zbLine, IniItem item) => items.Insert(zbLine, item);
@@ -61,7 +71,7 @@ namespace Chloride.CCiniExt
                     items.RemoveAt(i);
             }
             if (recurse && (Parent?.Contains(key, out _) ?? false))
-                Add(new(key, string.Empty));
+                Add(key, string.Empty);
             return !Contains(key, out _);
         }
         public bool Remove(IniItem item) => items.Remove(item);

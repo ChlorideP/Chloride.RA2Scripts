@@ -33,6 +33,11 @@ namespace Chloride.CCiniExt
                     Raw.Add(value);
             }
         }
+        public string? this[string section, string key]
+        {
+            get => this[section].GetValue(key);
+            set => this[section][key] = value;
+        }
 
         public int Count => Raw.Count;
 

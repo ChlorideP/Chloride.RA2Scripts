@@ -77,9 +77,8 @@ namespace Chloride.CCiniExt
         public bool Remove(IniItem item) => items.Remove(item);
         public void RemoveAt(int zbLine) => items.RemoveAt(zbLine);
         public void Clear() => items.Clear();
-        public bool Contains(string key, out IniItem item)
-            => (item = items.LastOrDefault(i => i.Key == key) ?? new()).IsPair || (Parent?.Contains(key, out item) ?? false);
-        public string? GetValue(string key) => Contains(key, out IniItem iKey) ? iKey.Value.ToString() : null;
+        public bool Contains(string key, out IniItem item) => (item = items.LastOrDefault(i => i.Key == key) ?? new()).IsPair;
+        public string? GetValue(string key) => Contains(key, out IniItem iKey) || (Parent?.Contains(key, out iKey) ?? false) ? iKey.Value.ToString() : null;
 
         /// <summary>
         /// Deep-copy the section given, and self-update.

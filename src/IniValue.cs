@@ -1,10 +1,11 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 namespace Chloride.CCiniExt
 {
     public struct IniValue
     {
-        internal string raw;
+        private readonly string raw;
 
         public IniValue(string? s) => raw = s ?? string.Empty;
         public IniValue() => raw = string.Empty;
@@ -17,11 +18,8 @@ namespace Chloride.CCiniExt
 
         public bool IsNull => string.IsNullOrEmpty(raw);
 
-        public static bool operator ==(IniValue v1, IniValue v2) => v1.raw == v2.raw;
-        public static bool operator !=(IniValue v1, IniValue v2) => v1.raw != v2.raw;
-
         public static explicit operator bool(IniValue value) =>
-            value.raw is not null
+            !value.IsNull
             && ((new char[] { 'y', 't', '1' }).Contains(char.ToLower(value.raw[0]))
             || ((new char[] { 'n', 'f', '0' }).Contains(char.ToLower(value.raw[0]))
             ? false : throw new FormatException($"{value.raw} is not bool")));
@@ -38,5 +36,7 @@ namespace Chloride.CCiniExt
         public static implicit operator IniValue(string? value) => new(value);
 
         public override string ToString() => raw;
+        public override bool Equals(object? obj) => raw.Equals((obj as IniValue?)?.raw);
+        public override int GetHashCode() => raw.GetHashCode();
     }
 }

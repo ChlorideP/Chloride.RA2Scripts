@@ -16,6 +16,9 @@ namespace Chloride.CCiniExt
             return re.IsMatch(raw) ? re.Split(raw) : throw new FormatException($"{raw} is not array");
         }
 
+        public static bool operator ==(IniValue v1, IniValue v2) => v1.raw == v2.raw;
+        public static bool operator !=(IniValue v1, IniValue v2) => v1.raw != v2.raw;
+
         public bool IsNull => string.IsNullOrEmpty(raw);
 
         public static explicit operator bool(IniValue value) =>

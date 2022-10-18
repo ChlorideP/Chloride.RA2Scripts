@@ -23,7 +23,7 @@ namespace Chloride.CCiniExt
         public static void Deserialize(IniDoc doc, TextReader tr)
         {
             int cur, max;
-            cur = max = doc.Count == 0 ? 0 : doc.Count - 1;
+            cur = max = doc.Count == 0 ? -1 : doc.Count - 1;
 
             bool HasSection(string name, out int idx) => (idx = doc.Raw.Select(i => i.Name).ToList().IndexOf(name)) != -1;
 
@@ -68,14 +68,16 @@ namespace Chloride.CCiniExt
                         if (strip.Contains('='))
                         {
                             var pair = strip.Split('=', 2);
+                            pair[0] = pair[0].Trim();
 
-                            var key = pair[0].Trim();
-                            IniValue val = pair[1].Split(';', 2)[0].Trim();
-                            var desc = val.IsNull ? pair[1] : new StringBuilder(pair[1])
-                                .Replace(val.ToString(), string.Empty, 0, pair[1].IndexOf(';') + 1)
+                            var key = pair[0] == "+" ? $"+{doc.diff++}" : pair[0];
+                            var val = pair[1].Split(';', 2)[0];
+                            IniValue value = val.Trim();
+                            var desc = value.IsNull ? pair[1] : new StringBuilder(pair[1])
+                                .Replace(value.ToString(), string.Empty, 0, val.Length)
                                 .ToString();
 
-                            doc.Raw[cur].Add(key, val, desc);
+                            doc.Raw[cur].Add(key, value, desc);
                         }
                         break;
                 }

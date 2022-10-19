@@ -52,5 +52,5 @@ rules.Serialize(rulesFile, "gb2312"); // buxv "ansi".
 using namespace Chloride.CCiniExt
 
 $eg = [IniDoc]::new()
-[IniSerializer]::Deserialize(".\ssks.ini")
+[IniSerializer]::Deserialize($eg, ".\ssks.ini")
 ```

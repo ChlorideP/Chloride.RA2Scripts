@@ -47,10 +47,19 @@ rules.Serialize(rulesFile, "gb2312"); // buxv "ansi".
 
 ### 其他用法
 作为模块导入 PowerShell Core 也是可以的。**注意不是 Windows PowerShell！**  
-只是读写文件可能有一些麻烦：PowerShell 不支持扩展方法，需要显式调用。
+只是读写文件可能有一些麻烦：
+- PowerShell 不支持扩展方法，需要显式调用。
+- PowerShell 不支持默认参数，方法里的默认参数必须全部（或全不）指定。
 ```PowerShell
 using namespace Chloride.CCiniExt
 
 $eg = [IniDoc]::new()
 [IniSerializer]::Deserialize($eg, ".\ssks.ini")
+# Serialize(this IniDoc doc,
+#           FileInfo iniFile,
+#           string encoding = "utf-8",
+#           string pairing = "=")
+[IniSerializer]::Serialize($eg, ".\ssks.ini")
+[IniSerializer]::Serialize($eg, ".\ssks_ansi.ini", "gb2312", "=")
+[IniSerializer]::Serialize($eg, ".\ssks_with_space.ini", "utf-8", " = ")
 ```

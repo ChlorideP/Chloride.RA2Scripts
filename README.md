@@ -37,7 +37,7 @@ var rulesFile = new FileInfo(".\\rulesmd.ini");
 var rules = InitIni(rulesFile);
 rules["Animations"] = new(
 	"Animations",
-	rules.GetTypeList("Animations").Select(i => new IniItem(idx++, i))
+	rules.GetTypeList("Animations").Select(i => new IniItem($"{idx++}", i))
 	);
 rules.Serialize(rulesFile, "gb2312"); // buxv "ansi".
 ```

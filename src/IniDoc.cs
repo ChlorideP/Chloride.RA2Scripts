@@ -90,7 +90,7 @@ namespace Chloride.CCiniExt
             => (section = Raw.FirstOrDefault(i => i.Name == sectionName)) != null;
 
         public string[] GetTypeList(string sect) => Contains(sect, out IniSection? ret)
-            ? ret!.Values.Select(i => i.ToString()).ToArray()
+            ? ret!.Values.Select(i => i.ToString()).Distinct().ToArray()
             : Array.Empty<string>();
 
         public IEnumerator<IniSection> GetEnumerator() => Raw.GetEnumerator();

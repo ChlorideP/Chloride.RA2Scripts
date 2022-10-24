@@ -1,18 +1,18 @@
-﻿namespace Chloride.CCiniExt
+﻿namespace Chloride.RA2.IniExt
 {
-    public class IniItem
+    public class IniEntry
     {
         public string Key { get; set; }
         public IniValue Value { get; set; }
         public string? Comment { get; set; }
 
-        public IniItem(string? desc = null) // empty line || description only
+        public IniEntry(string? desc = null) // empty line || description only
         {
             Key = string.Empty;
             Value = new();
             Comment = desc;
         }
-        public IniItem(string key, IniValue value, string? desc = null)
+        public IniEntry(string key, IniValue value, string? desc = null)
         {
             Key = key;
             Value = value;

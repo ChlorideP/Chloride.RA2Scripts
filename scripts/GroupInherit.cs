@@ -1,4 +1,4 @@
-﻿namespace Chloride.CCiniExt.Scripts
+﻿namespace Chloride.RA2.IniExt.Scripts
 {
     public static class GroupInherit
     {
@@ -64,7 +64,7 @@
         public static IniSection ExportUnique(IniSection dst, IniSection src)
         {
             IniSection ret = new(dst.Name, src, dst.Summary);
-            ret.AddRange(dst.Where(i => !i.IsPair || !src.Contains(i.Key, out IniItem isrc) || i.Value != isrc.Value));
+            ret.AddRange(dst.Where(i => !i.IsPair || !src.Contains(i.Key, out IniEntry isrc) || i.Value != isrc.Value));
             ret.AddRange(src.Where(i => i.IsPair && !dst.Contains(i.Key, out _)).Select(i =>
             {
                 i.Value = null;

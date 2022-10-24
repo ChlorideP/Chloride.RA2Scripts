@@ -19,12 +19,12 @@ Key=Value;Comment
     考虑到`114514　　　; 好臭藕`这种间隔特别长的注释，需要在 Git 里维持间隔、减少diff，
     实际存的注释是挖掉 Value 后的剩余字符串。
 
-* IniItem  
+* IniEntry  
     ini 中非节声明行就由上面三个组件构成。  
     三个组件均空，该行就空；Key为空Comment不空，就是纯注释；Key不空就是标准键值对了。
 
-- IEnumerable[IniItem] -> IniSection  
-    节声明`[Section]`底下的`IniItem`均属于该节，即节是`IniItem`的容器。  
+- IEnumerable[IniEntry] -> IniSection  
+    节是`IniEntry`的容器，节声明`[Section]`底下的`IniEntry`均属于该节。  
     节的实例不应与某个文档强绑定，赋值给其他 ini 理应能够正常食用。  
     除此之外节自身也有属性：
     - (string) Name  

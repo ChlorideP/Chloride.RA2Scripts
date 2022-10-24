@@ -1,4 +1,4 @@
-﻿namespace Chloride.CCiniExt.Scripts
+﻿namespace Chloride.RA2.IniExt.Scripts
 {
     public class INI
     {

@@ -1,7 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
-namespace Chloride.CCiniExt
+namespace Chloride.RA2.IniExt
 {
     public struct IniValue
     {

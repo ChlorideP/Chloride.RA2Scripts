@@ -1,4 +1,4 @@
-# Chloride.CCiniExt
+# Chloride.RA2.IniExt
 此类库用于处理带注释 Ares INI，同时是[PyMapRA2](https://github.com/Chloride1/PyMapRA2)项目中`relertpy.ccini`模块的扩展（原本只读键值对嘛）。
 
 ### 为何是 Ares INI？
@@ -22,7 +22,7 @@ Ares 是《红色警戒2：尤里的复仇》的扩展平台，它在 ini 方面
 ### 简单的用例
 下面的示例使用了 C# 9.0 的船新特性“顶级语句”，作用是重排动画注册表。
 ```C#
-using Chloride.CCiniExt;
+using Chloride.RA2.IniExt;
 
 IniDoc InitIni(FileInfo ini)
 {
@@ -43,7 +43,7 @@ rules.Serialize(rulesFile, "gb2312"); // buxv "ansi".
 ```
 
 ### 复杂的用例
-参见`Chloride.CCiniExt.Scripts.csproj`（位于`scripts`目录）。
+参见`Scripts`项目。
 
 ### 其他用法
 作为模块导入 PowerShell Core 也是可以的。**注意不是 Windows PowerShell！**  
@@ -51,7 +51,8 @@ rules.Serialize(rulesFile, "gb2312"); // buxv "ansi".
 - PowerShell 不支持扩展方法，需要显式调用。
 - PowerShell 不支持默认参数，方法里的默认参数必须全部（或全不）指定。
 ```PowerShell
-using namespace Chloride.CCiniExt
+using namespace Chloride.RA2.IniExt
+Import-Module ".\Chloride.RA2.IniExt.dll"
 
 $eg = [IniDoc]::new()
 [IniSerializer]::Deserialize($eg, ".\ssks.ini")

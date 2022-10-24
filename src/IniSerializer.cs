@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.PortableExecutable;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
-namespace Chloride.CCiniExt
+namespace Chloride.RA2.IniExt
 {
     public static class IniSerializer
     {
@@ -55,7 +50,7 @@ namespace Chloride.CCiniExt
                         {
                             doc.Raw.Add(new(
                                 curSect[0],
-                                curSect.Length > 1 ? (HasSection(curSect[1], out int iParent) ? doc.Raw[iParent] : new(curSect[1])) : null,
+                                curSect.Length > 1 ? HasSection(curSect[1], out int iParent) ? doc.Raw[iParent] : new(curSect[1]) : null,
                                 curDesc
                             ));
                             cur = ++max;

@@ -1,16 +1,16 @@
 ﻿using System.Collections;
 
-namespace Chloride.CCiniExt
+namespace Chloride.RA2.IniExt
 {
     // List (x)
     // Dictionary (o)
-    public class IniSection : IEnumerable<IniItem>, IComparable<IniSection>
+    public class IniSection : IEnumerable<IniEntry>, IComparable<IniSection>
     {
-        private List<IniItem> items = new();
+        private List<IniEntry> items = new();
 
         public IniValue this[string key]
         {
-            get => !(Contains(key, out IniItem i) || (Parent?.Contains(key, out i) ?? false))
+            get => !(Contains(key, out IniEntry i) || (Parent?.Contains(key, out i) ?? false))
                 ? throw new KeyNotFoundException(key) : i.Value;
             set => Add(key, value);
         }
@@ -36,7 +36,7 @@ namespace Chloride.CCiniExt
             Summary = desc;
         }
         // filter
-        public IniSection(string name, IEnumerable<IniItem> source) : this(name) =>
+        public IniSection(string name, IEnumerable<IniEntry> source) : this(name) =>
             items.AddRange(source.Where(i => i.IsPair).Select(i =>
             {
                 i.Comment = null;
@@ -52,7 +52,7 @@ namespace Chloride.CCiniExt
         public void Add(string? desc = null) => items.Add(new(desc));
         public void Add(string key, IniValue value, string? desc = null)
         {
-            if (!Contains(key, out IniItem item))
+            if (!Contains(key, out IniEntry item))
             {
                 item.Key = key;
                 items.Add(item);
@@ -60,9 +60,9 @@ namespace Chloride.CCiniExt
             item.Value = value;
             item.Comment = desc ?? item.Comment;
         }
-        public void AddRange(IEnumerable<IniItem> items) => this.items.AddRange(items);
-        public void AddRange(IDictionary<string, IniValue> dict) => items.AddRange(dict.Select(i => new IniItem(i.Key, i.Value)));
-        public void Insert(int zbLine, IniItem item) => items.Insert(zbLine, item);
+        public void AddRange(IEnumerable<IniEntry> items) => this.items.AddRange(items);
+        public void AddRange(IDictionary<string, IniValue> dict) => items.AddRange(dict.Select(i => new IniEntry(i.Key, i.Value)));
+        public void Insert(int zbLine, IniEntry item) => items.Insert(zbLine, item);
         public bool Remove(string key, bool recurse = false)
         {
             for (int i = items.Count - 1; i >= 0; i--)
@@ -74,11 +74,11 @@ namespace Chloride.CCiniExt
                 Add(key, string.Empty);
             return !Contains(key, out _);
         }
-        public bool Remove(IniItem item) => items.Remove(item);
+        public bool Remove(IniEntry item) => items.Remove(item);
         public void RemoveAt(int zbLine) => items.RemoveAt(zbLine);
         public void Clear() => items.Clear();
-        public bool Contains(string key, out IniItem item) => (item = items.LastOrDefault(i => i.Key == key) ?? new()).IsPair;
-        public string? GetValue(string key) => Contains(key, out IniItem iKey) || (Parent?.Contains(key, out iKey) ?? false) ? iKey.Value.ToString() : null;
+        public bool Contains(string key, out IniEntry item) => (item = items.LastOrDefault(i => i.Key == key) ?? new()).IsPair;
+        public string? GetValue(string key) => Contains(key, out IniEntry iKey) || (Parent?.Contains(key, out iKey) ?? false) ? iKey.Value.ToString() : null;
 
         /// <summary>
         /// Deep-copy the section given, and self-update.
@@ -91,7 +91,7 @@ namespace Chloride.CCiniExt
             items = section.ToList();
         }
         public int CompareTo(IniSection? other) => Name.CompareTo(other?.Name);
-        public IEnumerator<IniItem> GetEnumerator() => items.GetEnumerator();
+        public IEnumerator<IniEntry> GetEnumerator() => items.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();
 
         public override string ToString()

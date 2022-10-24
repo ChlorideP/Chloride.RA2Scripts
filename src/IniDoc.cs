@@ -1,8 +1,6 @@
 ﻿using System.Collections;
-using System.Collections.ObjectModel;
-using System.Text;
 
-namespace Chloride.CCiniExt
+namespace Chloride.RA2.IniExt
 {
     public class IniDoc : IEnumerable<IniSection>
     {

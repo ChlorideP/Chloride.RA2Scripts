@@ -60,7 +60,7 @@ namespace Chloride.RA2.IniExt
                         if (cur == -1)
                             doc.Head.Add(line!);
                         else
-                            doc.Raw[cur].Add(new(line));
+                            doc.Raw[cur].Add(line);
                         break;
                     default:
                         if (strip.Contains('='))

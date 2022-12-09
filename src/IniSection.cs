@@ -12,7 +12,15 @@ namespace Chloride.RA2.IniExt
         {
             get => !(Contains(key, out IniEntry i) || (Parent?.Contains(key, out i) ?? false))
                 ? throw new KeyNotFoundException(key) : i.Value;
-            set => Add(key, value);
+            set
+            {
+                if (!Contains(key, out IniEntry item))
+                {
+                    item.Key = key;
+                    items.Add(item);
+                }
+                item.Value = value;
+            }
         }
 
         public string Name { get; set; }
@@ -50,16 +58,7 @@ namespace Chloride.RA2.IniExt
         public Dictionary<string, IniValue> Items => items.Where(i => !string.IsNullOrEmpty(i.Key)).ToDictionary(i => i.Key, i => i.Value);
 
         public void Add(string? desc = null) => items.Add(new(desc));
-        public void Add(string key, IniValue value, string? desc = null)
-        {
-            if (!Contains(key, out IniEntry item))
-            {
-                item.Key = key;
-                items.Add(item);
-            }
-            item.Value = value;
-            item.Comment = desc ?? item.Comment;
-        }
+        public void Add(string key, IniValue value, string? desc = null) => items.Add(new(key, value, desc));
         public void AddRange(IEnumerable<IniEntry> items) => this.items.AddRange(items);
         public void AddRange(IDictionary<string, IniValue> dict) => items.AddRange(dict.Select(i => new IniEntry(i.Key, i.Value)));
         public void Insert(int zbLine, IniEntry item) => items.Insert(zbLine, item);

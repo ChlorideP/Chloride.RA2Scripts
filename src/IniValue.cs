@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Chloride.RA2.IniExt
 {
@@ -9,6 +10,8 @@ namespace Chloride.RA2.IniExt
         public IniValue(string? s) => raw = s ?? string.Empty;
         public IniValue() => raw = string.Empty;
 
+        public static IniValue TryJoin<T>(IEnumerable<T> seq) where T : notnull => new(string.Join(',', seq));
+        public static IniValue TryJoin<T>(params T[] values) where T : notnull => TryJoin(values);
         public string[] TrySplit()
         {
             var re = new Regex(",+");

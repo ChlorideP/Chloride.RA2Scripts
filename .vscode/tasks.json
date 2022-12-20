@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/scripts/Chloride.CCiniExt.Scripts.csproj",
+                "${workspaceFolder}/scripts/Scripts.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/scripts/Chloride.CCiniExt.Scripts.csproj",
+                "${workspaceFolder}/scripts/Scripts.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/scripts/Chloride.CCiniExt.Scripts.csproj"
+                "${workspaceFolder}/scripts/Scripts.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

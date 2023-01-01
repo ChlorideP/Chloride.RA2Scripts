@@ -42,9 +42,9 @@ namespace Chloride.RA2.IniExt
 
                         if (!doc.Contains(curSect[0], out self))
                         {
-                            self = new(curSect[0], curDesc);
-                            if (doc.Contains(curSect[1], out super))
-                                self.Parent = super;
+                            if (curSect.Length > 1)
+                                _ = doc.Contains(curSect[1], out super);
+                            self = new(curSect[0], curDesc, super);
                             doc.Add(self);
                         }
                         break;

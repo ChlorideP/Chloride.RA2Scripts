@@ -20,10 +20,7 @@ namespace Chloride.RA2.IniExt
 
         public static void Deserialize(IniDoc doc, TextReader tr)
         {
-            int cur, max;
-            cur = max = doc.Count == 0 ? -1 : doc.Count - 1;
-
-            bool HasSection(string name, out int idx) => (idx = doc.Raw.Select(i => i.Name).ToList().IndexOf(name)) != -1;
+            IniSection? self = doc.Default, super = null;
 
             while (tr.Peek() > 0)
             {
@@ -32,10 +29,7 @@ namespace Chloride.RA2.IniExt
 
                 if (string.IsNullOrEmpty(strip))
                 {
-                    if (cur == -1)
-                        doc.Head.Add(string.Empty);
-                    else
-                        doc.Raw[cur].Add();
+                    self!.Add();
                     continue;
                 }
 
@@ -46,21 +40,16 @@ namespace Chloride.RA2.IniExt
                         var curSect = sect.First().Split(':').Select(i => i.Trim()[1..^1]).ToArray();
                         var curDesc = sect.ElementAtOrDefault(1);
 
-                        if (!HasSection(curSect[0], out cur))
+                        if (!doc.Contains(curSect[0], out self))
                         {
-                            doc.Raw.Add(new(
-                                curSect[0],
-                                curSect.Length > 1 ? HasSection(curSect[1], out int iParent) ? doc.Raw[iParent] : new(curSect[1]) : null,
-                                curDesc
-                            ));
-                            cur = ++max;
+                            self = new(curSect[0], curDesc);
+                            if (doc.Contains(curSect[1], out super))
+                                self.Parent = super;
+                            doc.Add(self);
                         }
                         break;
                     case ';':
-                        if (cur == -1)
-                            doc.Head.Add(line!);
-                        else
-                            doc.Raw[cur].Add(line);
+                        self!.Add(line);
                         break;
                     default:
                         if (strip.Contains('='))
@@ -68,14 +57,14 @@ namespace Chloride.RA2.IniExt
                             var pair = strip.Split('=', 2);
                             pair[0] = pair[0].Trim();
 
-                            var key = pair[0] == "+" ? $"+{doc.diff++}" : pair[0];
+                            var key = pair[0] == "+" ? $"+{doc.Diff++}" : pair[0];
                             var val = pair[1].Split(';', 2)[0];
-                            IniValue value = val.Trim();
-                            var desc = value.IsNull ? pair[1] : new StringBuilder(pair[1])
+                            var value = val.Trim();
+                            var desc = string.IsNullOrEmpty(value) ? pair[1] : new StringBuilder(pair[1])
                                 .Replace(value.ToString(), string.Empty, 0, val.Length)
                                 .ToString();
 
-                            doc.Raw[cur].Add(key, value, desc);
+                            self!.Add(key, value, desc);
                         }
                         break;
                 }
@@ -94,8 +83,8 @@ namespace Chloride.RA2.IniExt
 
         public static void Serialize(IniDoc doc, TextWriter tw, string pairing = "=")
         {
-            foreach (var i in doc.Head)
-                tw.WriteLine(i);
+            foreach (var i in doc.Default)
+                tw.WriteLine(i.ToString());
 
             foreach (var i in doc)
             {

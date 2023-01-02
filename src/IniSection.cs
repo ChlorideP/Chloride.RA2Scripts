@@ -57,7 +57,7 @@ public class IniSection : IEnumerable<IniEntry>, IComparable<IniSection>
     public IEnumerable<string> Values => items.Where(i => !string.IsNullOrEmpty(i.Key)).Select(i => i.Value ?? string.Empty);
     public Dictionary<string, string?> Items => items.Where(i => !string.IsNullOrEmpty(i.Key)).ToDictionary(i => i.Key, i => i.Value);
 
-    public void Add(string? desc = null) => items.Add(new(desc));
+    public void Add(string? desc = null) => items.Add(new(desc: desc));
     public void Add<T>(string key, T value, string? desc = null) => items.Add(new(key, value?.ToString(), desc));
     public void AddRange(IEnumerable<IniEntry> items) => this.items.AddRange(items);
     public void AddRange(IDictionary<string, string?> dict) => items.AddRange(dict.Select(i => new IniEntry(i.Key, i.Value)));

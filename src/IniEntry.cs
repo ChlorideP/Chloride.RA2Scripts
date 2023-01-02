@@ -17,6 +17,8 @@ public class IniEntry
     public bool IsPair => !string.IsNullOrEmpty(Key);
     public bool IsEmptyLine => !IsPair && string.IsNullOrWhiteSpace(Comment);
 
+    public override string ToString() => ToString(": ");
+
     public string ToString(string pairLinker = "=")
     {
         StringBuilder sb = new();

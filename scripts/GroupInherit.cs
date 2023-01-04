@@ -35,22 +35,22 @@
                     continue;
                 Console.WriteLine($"Processing {i.Key} - {i.Value} {i.Comment}");
 
-                INI iRules = new(i.Value!.Replace('\"', ' ').Trim());
+                INI iRules = new(i.Value.ToString().Replace('\"', ' ').Trim());
                 INI? iArt = string.IsNullOrEmpty(i.Comment) || string.IsNullOrWhiteSpace(i.Comment)
                     ? null
                     : new(i.Comment[(i.Comment.IndexOf(';') + 1)..].Replace('\"', ' ').Trim());
 
                 foreach (var j in config[$"Arguments{i.Key}"].Items)
                 {
-                    if (!(iRules.ini.Contains(j.Key, out IniSection? jDst) && rules.ini.Contains(j.Value!, out IniSection? jSrc)))
+                    if (!(iRules.ini.Contains(j.Key, out IniSection? jDst) && rules.ini.Contains(j.Value.ToString(), out IniSection? jSrc)))
                         continue;
                     Console.WriteLine($"{j.Key} -> {j.Value}");
 
                     iRules[j.Key] = ExportUnique(jDst!, jSrc!);
                     if (iArt != null)
                     {
-                        var dstimg = jDst!["Image"] ?? j.Key;
-                        var srcimg = jSrc!["Image"] ?? (string)j.Value!;
+                        var dstimg = jDst!.GetValue("Image") ?? j.Key;
+                        var srcimg = jSrc!.GetValue("Image") ?? (string)j.Value;
                         if (dstimg != srcimg && iArt.ini.Contains(dstimg, out IniSection? aDst) && art.ini.Contains(srcimg, out IniSection? aSrc))
                             iArt[j.Key] = ExportUnique(aDst!, aSrc!);
                     }
@@ -63,7 +63,7 @@
 
         public static IniSection ExportUnique(IniSection dst, IniSection src)
         {
-            IniSection ret = new(dst.Name, dst.Summary, src);
+            IniSection ret = new(dst.Name, src, dst.Summary);
             ret.AddRange(dst.Where(i => !i.IsPair || !src.Contains(i.Key, out IniEntry isrc) || i.Value != isrc.Value));
             ret.AddRange(src.Where(i => i.IsPair && !dst.Contains(i.Key, out _)).Select(i =>
             {

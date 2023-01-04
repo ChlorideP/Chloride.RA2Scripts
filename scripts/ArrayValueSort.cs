@@ -6,7 +6,7 @@
 
         public ArrayValueSort(IniSection order)
         {
-            this.order = order.Values.ToList();
+            this.order = order.Values.Select(i => i.ToString()).ToList();
         }
 
         /* config.ini 示例：
@@ -26,18 +26,18 @@
 
         public void Run(INI config)
         {
-            var target = new INI(config["Settings", "Target"]);
+            var target = new INI(config["Settings"]["target"].ToString());
             var type = config["Settings", "IterTypeList"];
             var key = config["Settings", "KeyToSort"];
 
-            foreach (var i in target[type].Values)
+            foreach (var i in target[type].Values.Select(i => i.ToString()))
             {
                 if (!target.ini.Contains(i, out IniSection? isect))
                     continue;
 
                 try
                 {
-                    var gamemodes = isect![key]!.Split(',').ToList();
+                    var gamemodes = isect![key].TrySplit().ToList();
                     gamemodes.Sort(this);
                     isect![key] = string.Join(',', gamemodes);
                 }

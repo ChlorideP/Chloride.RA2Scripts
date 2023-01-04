@@ -10,3 +10,6 @@ ini 批处理脚本范例。
 
 - `GroupInherit.cs` 将换皮组件改成继承写法。
 - `ArrayValueSort.cs` 根据已知顺序，将特定注册表`IterTypeList`中成员的特定键`KeyToSort`重新排序。  
+
+### 关于 null 警告
+值为 null 的情况只可能是 IniDoc\[sect, key\] 访问的时候找不到。正常照写的 config.ini 不可能 null。

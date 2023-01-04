@@ -36,7 +36,7 @@ public class IniSection : IEnumerable<IniEntry>, IComparable<IniSection>
         items = source.ToList();
     }
 
-    public string? this[string key]
+    public IniValue this[string key]
     {
         get => !(Contains(key, out IniEntry i) || (Parent?.Contains(key, out i) ?? false))
             ? throw new KeyNotFoundException(key) : i.Value;
@@ -47,20 +47,20 @@ public class IniSection : IEnumerable<IniEntry>, IComparable<IniSection>
                 item.Key = key;
                 items.Add(item);
             }
-            item.Value = value;
+            item.Value = value.ToString();
         }
     }
 
     public int Count => items.Count;
 
     public IEnumerable<string> Keys => items.Where(i => !string.IsNullOrEmpty(i.Key)).Select(i => i.Key);
-    public IEnumerable<string> Values => items.Where(i => !string.IsNullOrEmpty(i.Key)).Select(i => i.Value ?? string.Empty);
-    public Dictionary<string, string> Items => items.Where(i => !string.IsNullOrEmpty(i.Key)).ToDictionary(i => i.Key, i => i.Value ?? string.Empty);
+    public IEnumerable<string> Values => items.Where(i => !string.IsNullOrEmpty(i.Key)).Select(i => i.Value);
+    public Dictionary<string, IniValue> Items => items.Where(i => !string.IsNullOrEmpty(i.Key)).ToDictionary(i => i.Key, i => new IniValue(i.Value));
 
     public void Add(string? desc = null) => items.Add(new(desc: desc));
     public void Add<T>(string key, T value, string? desc = null) => items.Add(new(key, value?.ToString(), desc));
     public void AddRange(IEnumerable<IniEntry> items) => this.items.AddRange(items);
-    public void AddRange(IDictionary<string, string> dict) => items.AddRange(dict.Select(i => new IniEntry(i.Key, i.Value)));
+    public void AddRange(IDictionary<string, IniValue> dict) => items.AddRange(dict.Select(i => new IniEntry(i.Key, i.Value.ToString())));
     public void Insert(int zbLine, IniEntry item) => items.Insert(zbLine, item);
     public bool Remove(string key, bool recurse = false)
     {

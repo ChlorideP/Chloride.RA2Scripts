@@ -20,6 +20,11 @@
          * ToReplace = ToMerge
          */
 
+        private static string? GetValue(this IniSection sect, string key) {
+            try { return sect[key].ToString(); }
+            catch { return null; }
+        }
+
         /// <summary>
         /// 用给定的 config、全局 rules 和 art 跑合并脚本。
         /// </summary>
@@ -35,7 +40,7 @@
                     continue;
                 Console.WriteLine($"Processing {i.Key} - {i.Value} {i.Comment}");
 
-                INI iRules = new(i.Value.ToString().Replace('\"', ' ').Trim());
+                INI iRules = new(i.Value.Replace('\"', ' ').Trim());
                 INI? iArt = string.IsNullOrEmpty(i.Comment) || string.IsNullOrWhiteSpace(i.Comment)
                     ? null
                     : new(i.Comment[(i.Comment.IndexOf(';') + 1)..].Replace('\"', ' ').Trim());
@@ -50,7 +55,7 @@
                     if (iArt != null)
                     {
                         var dstimg = jDst!.GetValue("Image") ?? j.Key;
-                        var srcimg = jSrc!.GetValue("Image") ?? (string)j.Value;
+                        var srcimg = jSrc!.GetValue("Image") ?? j.Value.ToString();
                         if (dstimg != srcimg && iArt.ini.Contains(dstimg, out IniSection? aDst) && art.ini.Contains(srcimg, out IniSection? aSrc))
                             iArt[j.Key] = ExportUnique(aDst!, aSrc!);
                     }
@@ -67,7 +72,7 @@
             ret.AddRange(dst.Where(i => !i.IsPair || !src.Contains(i.Key, out IniEntry isrc) || i.Value != isrc.Value));
             ret.AddRange(src.Where(i => i.IsPair && !dst.Contains(i.Key, out _)).Select(i =>
             {
-                i.Value = null;
+                i.Value = string.Empty;
                 return i;
             }));
             return ret;

@@ -28,7 +28,10 @@ public class IniDoc : IEnumerable<IniSection>
     }
     public string? this[string section, string key]
     {
-        get => this[section][key];
+        get {
+            try { return this[section][key].ToString(); }
+            catch { return null; }
+        }
         set => this[section][key] = value;
     }
 

@@ -26,7 +26,7 @@
 
         public void Run(INI config)
         {
-            var target = new INI(config["Settings"]["target"].ToString());
+            var target = new INI(config["Settings", "target"]);
             var type = config["Settings", "IterTypeList"];
             var key = config["Settings", "KeyToSort"];
 
@@ -37,7 +37,7 @@
 
                 try
                 {
-                    var gamemodes = isect![key].TrySplit().ToList();
+                    var gamemodes = isect![key].Split().ToList();
                     gamemodes.Sort(this);
                     isect![key] = string.Join(',', gamemodes);
                 }

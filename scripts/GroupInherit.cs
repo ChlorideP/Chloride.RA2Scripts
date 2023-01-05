@@ -1,72 +1,58 @@
-﻿namespace Chloride.RA2.IniExt.Scripts
+﻿namespace Chloride.RA2.IniExt.Scripts;
+public class GroupInherit : IScript<GroupInherit.Capturer>
 {
-    public static class GroupInherit
+    // 原初的例子就是。。把换皮改写成继承
+    // 毕竟以前换皮都是复制了再改嘛。
+    // 知道了这个功能或许就想给自己写过的x山简并一下。
+
+    // PS: 继承得基于 Ares 藕。再往前的平台（包括原版）是不得行的。
+
+    public Capturer Config { get; set; }
+    public IEnumerable<Capturer> Configs;
+    public IniDoc GlobalRules;
+    public IniDoc GlobalArt;
+
+    public class Capturer : IConfig
     {
-        /* 这里 config.ini 大致如下：
-         * 
-         * ; 待操作ini
-         * [CaptureList]
-         * 0 = subRules ;subArt
-         * ssks = subRB ;subAB
-         * 
-         * ; 表中项“0”待替换内容
-         * ; 比如有一个换皮建筑 A 打算搞成继承原建筑 B
-         * ; 就 A = B
-         * [Arguments0]
-         * ToReplace = ToMerge
-         * 
-         * ; Arguments 后面跟着 CaptureList 中的左值
-         * [Argumentsssks]
-         * ToReplace = ToMerge
-         */
+        /* config.ini
+        ; 全局ini，对照组
+        [Globals]
+        rules =
+        art =
 
-        private static string? GetValue(this IniSection sect, string key) {
-            try { return sect[key].ToString(); }
-            catch { return null; }
-        }
+        ; 待操作ini
+        [CaptureList]
+        0 = subRules ;subArt
+        ssks = subRB ;subAB
+        
+        ; 表中项“0”待替换内容
+        ; 比如有一个换皮建筑 A 打算搞成继承原建筑 B
+        ; 就 A = B
+        [Arguments0]
+        ToReplace = ToMerge
+        
+        ; Arguments 后面跟着 CaptureList 中的左值
+        [Argumentsssks]
+        ToReplace = ToMerge
+        */
 
+        internal string rules;
+        internal string? art;
+        public IniDoc Rules => Common.InitWithInis(rules);
+        public IniDoc? Art => art == null ? null : Common.InitWithInis(art);
         /// <summary>
-        /// 用给定的 config、全局 rules 和 art 跑合并脚本。
+        /// Key为待合并项，Value为对应母本
         /// </summary>
-        /// <param name="config"></param>
+        public Dictionary<string, IniValue> CaptureSheet;
 
-        public static void Run(INI config)
+        public Capturer(string pRules, Dictionary<string, IniValue> sheet, string? pArt = null)
         {
-            var (rules, art) = Common.LoadGlobals(config);
-
-            foreach (var i in config["CaptureList"])
-            {
-                if (!i.IsPair)
-                    continue;
-                Console.WriteLine($"Processing {i.Key} - {i.Value} {i.Comment}");
-
-                INI iRules = new(i.Value.Replace('\"', ' ').Trim());
-                INI? iArt = string.IsNullOrEmpty(i.Comment) || string.IsNullOrWhiteSpace(i.Comment)
-                    ? null
-                    : new(i.Comment[(i.Comment.IndexOf(';') + 1)..].Replace('\"', ' ').Trim());
-
-                foreach (var j in config[$"Arguments{i.Key}"].Items)
-                {
-                    if (!(iRules.ini.Contains(j.Key, out IniSection? jDst) && rules.ini.Contains(j.Value.ToString(), out IniSection? jSrc)))
-                        continue;
-                    Console.WriteLine($"{j.Key} -> {j.Value}");
-
-                    iRules[j.Key] = ExportUnique(jDst!, jSrc!);
-                    if (iArt != null)
-                    {
-                        var dstimg = jDst!.GetValue("Image") ?? j.Key;
-                        var srcimg = jSrc!.GetValue("Image") ?? j.Value.ToString();
-                        if (dstimg != srcimg && iArt.ini.Contains(dstimg, out IniSection? aDst) && art.ini.Contains(srcimg, out IniSection? aSrc))
-                            iArt[j.Key] = ExportUnique(aDst!, aSrc!);
-                    }
-                }
-                iRules.Save();
-                iArt?.Save();
-                Console.WriteLine("Done.\n");
-            }
+            rules = pRules;
+            art = pArt;
+            CaptureSheet = sheet;
         }
 
-        public static IniSection ExportUnique(IniSection dst, IniSection src)
+        public static IniSection Capture(IniSection dst, IniSection src)
         {
             IniSection ret = new(dst.Name, src, dst.Summary);
             ret.AddRange(dst.Where(i => !i.IsPair || !src.Contains(i.Key, out IniEntry isrc) || i.Value != isrc.Value));
@@ -76,6 +62,52 @@
                 return i;
             }));
             return ret;
+        }
+    }
+
+    public GroupInherit(IniDoc config)
+    {
+        GlobalRules = Common.InitWithInis(config["Globals", "rules"]!);
+        GlobalArt = Common.InitWithInis(config["Globals", "art"]!);
+        Configs = config["CaptureList"].Where(i => i.IsPair).Select(i => new Capturer(
+            i.Value.Replace('\"', ' ').Trim(),
+            config[$"Arguments{i.Key}"].Items,
+            string.IsNullOrEmpty(i.Comment) || string.IsNullOrWhiteSpace(i.Comment)
+            ? null
+            : new(i.Comment[(i.Comment.IndexOf(';') + 1)..].Replace('\"', ' ').Trim())));
+        Config = Configs.First();
+    }
+
+    public void Run()
+    {
+        var iter = Configs.GetEnumerator();
+
+        while (iter.MoveNext())
+        {
+            Config = iter.Current;
+            Console.WriteLine($"Processing {Config.rules} {Config.art}");
+
+            var iRules = Config.Rules;
+            var iArt = Config.Art;
+
+            foreach (var j in Config.CaptureSheet)
+            {
+                if (!(iRules.Contains(j.Key, out IniSection? jDst) && GlobalRules.Contains(j.Value.ToString(), out IniSection? jSrc)))
+                    continue;
+                Console.WriteLine($"{j.Key} -> {j.Value}");
+
+                iRules[j.Key] = Capturer.Capture(jDst!, jSrc!);
+                if (iArt != null)
+                {
+                    var dstimg = jDst!.GetValue("Image") ?? j.Key;
+                    var srcimg = jSrc!.GetValue("Image") ?? j.Value.ToString();
+                    if (dstimg != srcimg && iArt.Contains(dstimg, out IniSection? aDst) && GlobalArt.Contains(srcimg, out IniSection? aSrc))
+                        iArt[j.Key] = Capturer.Capture(aDst!, aSrc!);
+                }
+            }
+            iRules.Serialize(new FileInfo(Config.rules));
+            iArt?.Serialize(new FileInfo(Config.art!));
+            Console.WriteLine("Done.\n");
         }
     }
 }

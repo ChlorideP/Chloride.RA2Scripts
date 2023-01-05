@@ -41,7 +41,8 @@ public static class IniSerializer
 
                     if (!doc.Contains(curSect[0], out self))
                     {
-                        if (curSect.Length > 1) {
+                        if (curSect.Length > 1)
+                        {
                             _ = doc.Contains(curSect[1], out super);
                             super = super ?? new(curSect[1]);
                         }

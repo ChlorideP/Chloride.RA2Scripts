@@ -98,7 +98,8 @@ public class IniSection : IEnumerable<IniEntry>, IComparable<IniSection>
         sb.Append($"[{Name}]");
         if (!string.IsNullOrEmpty(Parent?.Name))
             sb.Append($":[{Parent.Name}]");
-        sb.Append($";{Summary}");
+        if (!string.IsNullOrEmpty(Summary))
+            sb.Append($";{Summary}");
         return sb.ToString();
     }
 }

@@ -3,17 +3,22 @@ public static class Common
 {
     public static void Main()
     {
-        var config = InitWithInis("config.ini");
+        var config = InitIni("config.ini");
         // new ScriptName(config).Run();
         new ArrayValueSort(config).Run();
     }
 
-    public static IniDoc InitWithInis(params string[] paths)
+    public static IniDoc InitIni(string path)
     {
-        var ret = new IniDoc();
+        IniDoc ret = new();
+        FileInfo fi = new(path);
+        ret.Deserialize(fi);
+        // 只读一层捏。不会真有人套娃 [#include] 罢？
         ret.Deserialize(
-            paths.Select(i => new FileInfo(i))
-            .Where(i => i.Exists).ToArray());
+            ret.GetTypeList("#include")
+            .Select(i => new FileInfo(Path.Combine(fi.DirectoryName!, i)))
+            .Where(i => i.Exists)
+            .ToArray());
         return ret;
     }
 

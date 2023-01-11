@@ -38,8 +38,8 @@ public class GroupInherit : IScript<GroupInherit.Capturer>
 
         internal string rules;
         internal string? art;
-        public IniDoc Rules => Common.InitWithInis(rules);
-        public IniDoc? Art => art == null ? null : Common.InitWithInis(art);
+        public IniDoc Rules => Common.InitIni(rules);
+        public IniDoc? Art => art == null ? null : Common.InitIni(art);
         /// <summary>
         /// Key为待合并项，Value为对应母本
         /// </summary>
@@ -67,14 +67,13 @@ public class GroupInherit : IScript<GroupInherit.Capturer>
 
     public GroupInherit(IniDoc config)
     {
-        GlobalRules = Common.InitWithInis(config["Globals", "rules"]!);
-        GlobalArt = Common.InitWithInis(config["Globals", "art"]!);
+        GlobalRules = Common.InitIni(config["Globals", "rules"]!.Replace('\"', ' ').Trim());
+        GlobalArt = Common.InitIni(config["Globals", "art"]!.Replace('\"', ' ').Trim());
         Configs = config["CaptureList"].Where(i => i.IsPair).Select(i => new Capturer(
             i.Value.Replace('\"', ' ').Trim(),
             config[$"Arguments{i.Key}"].Items,
             string.IsNullOrEmpty(i.Comment) || string.IsNullOrWhiteSpace(i.Comment)
-            ? null
-            : new(i.Comment[(i.Comment.IndexOf(';') + 1)..].Replace('\"', ' ').Trim())));
+                ? null : new(i.Comment[(i.Comment.IndexOf(';') + 1)..].Replace('\"', ' ').Trim())));
         Config = Configs.First();
     }
 

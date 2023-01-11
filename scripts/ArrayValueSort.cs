@@ -51,7 +51,7 @@ public class ArrayValueSort : IScript<ArrayValueSort.Sorter>
 
     public void Run()
     {
-        var docTarget = Common.InitWithInis(Config.Target!);
+        var docTarget = Common.InitIni(Config.Target!);
 
         foreach (var i in docTarget[Config.TypeList!].Values)
         {

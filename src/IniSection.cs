@@ -78,9 +78,21 @@ public class IniSection : IEnumerable<IniEntry>, IComparable<IniSection>
     public void Clear() => items.Clear();
     public bool Contains(string key, out IniEntry item) => (item = items.LastOrDefault(i => i.Key == key) ?? new()).IsPair;
     /// <summary>
+    /// <para/>Get specific value of key, and remove that entry.
+    /// <para/>May be useful when processing map components.
+    /// </summary>
+    /// <param name="fallback">If key not found, use this instead.</param>
+    public IniValue? Pop(string key, IniValue? fallback = null) {
+        if (Contains(key, out IniEntry e)) {
+            fallback = e.Value;
+            items.Remove(e);
+        }
+        return fallback;
+    }
+    /// <summary>
     /// Deep-copy the section given, and self-update.
     /// </summary>
-    public void Update(IniSection section)
+    internal void Update(IniSection section)
     {
         Name = section.Name;
         Summary = section.Summary;

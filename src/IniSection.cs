@@ -69,21 +69,31 @@ public class IniSection : IEnumerable<IniEntry>, IComparable<IniSection>
     public void AddRange(IEnumerable<IniEntry> items) => this.items.AddRange(items);
     public void AddRange(IDictionary<string, IniValue> dict) => items.AddRange(dict.Select(i => new IniEntry(i.Key, i.Value.ToString())));
     public void Insert(int zbLine, IniEntry item) => items.Insert(zbLine, item);
-    // just like Pop(key, fallback) we designed before.
-    public bool Remove(string key, out IniValue? val)
+    /// <summary>
+    /// Remove specific key-value entry.
+    /// </summary>
+    /// <param name="recursive">To confirm its Parent. (won't do anything however)</param>
+    /// <returns>true if not found anymore, otherwise false.</returns>
+    public bool Remove(string key, bool recursive = false)
     {
-        // we resume the repeating key filter, so no need to checkout each one.
+        bool ret = true;
         if (Contains(key, out IniEntry e))
+            ret = items.Remove(e);
+        else if (recursive)
         {
-            val = e.Value;
-            return items.Remove(e);
-        }
-        else
-        {
-            val = null;
-            return false;
-        }
+            for (var parent = Parent; parent != null && parent.Count > 0; parent = parent?.Parent)
+                if (parent.Contains(key, out _))
+                {
+                    ret = false;
+                    break;
+                }
+        } 
+        return ret;
     }
+    // => Contains(key, out IniEntry e)
+    //     ? items.Remove(e)
+    //     // there may be several sections inherited from the Parent, so don't try to remove outside this.
+    //     : recursive && !(Parent?.Contains(key, out _) ?? false);
     public bool Remove(IniEntry item) => items.Remove(item);
     public void RemoveAt(int zbLine) => items.RemoveAt(zbLine);
     public void Clear() => items.Clear();

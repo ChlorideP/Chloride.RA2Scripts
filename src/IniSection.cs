@@ -4,6 +4,12 @@ using System.Text;
 namespace Chloride.RA2.IniExt;
 public class IniSection : IEnumerable<IniEntry>, IComparable<IniSection>
 {
+    // Although we all consider ini as a tree, there is 3 elements in an IniEntry.
+    // To organize all possible situations (empty lines, comment lines, pair lines), linear storage is necessary.
+
+    // U ask me why support pure comment lines even empty lines?
+    // Git differ considers them. And for my convenience I shall SL them properly.
+    // It's no way that my ini are in a big mess when script is done.
     private List<IniEntry> items;
 
     public string Name { get; set; }
@@ -40,15 +46,7 @@ public class IniSection : IEnumerable<IniEntry>, IComparable<IniSection>
     {
         get => !(Contains(key, out IniEntry i) || (Parent?.Contains(key, out i) ?? false))
             ? throw new KeyNotFoundException(key) : i.Value;
-        set
-        {
-            if (!Contains(key, out IniEntry item))
-            {
-                item.Key = key;
-                items.Add(item);
-            }
-            item.Value = value.ToString();
-        }
+        set => Add(key, value);
     }
 
     public int Count => items.Count;
@@ -58,37 +56,38 @@ public class IniSection : IEnumerable<IniEntry>, IComparable<IniSection>
     public Dictionary<string, IniValue> Items => items.Where(i => !string.IsNullOrEmpty(i.Key)).ToDictionary(i => i.Key, i => new IniValue(i.Value));
 
     public void Add(string? desc = null) => items.Add(new(desc: desc));
-    public void Add<T>(string key, T value, string? desc = null) => items.Add(new(key, value?.ToString(), desc));
+    public void Add<T>(string key, T value, string? desc = null) where T : notnull
+    {
+        if (!Contains(key, out IniEntry item))
+        {
+            item.Key = key;
+            items.Add(item);
+        }
+        item.Value = value.ToString() ?? string.Empty;
+        item.Comment = desc ?? item.Comment;
+    }
     public void AddRange(IEnumerable<IniEntry> items) => this.items.AddRange(items);
     public void AddRange(IDictionary<string, IniValue> dict) => items.AddRange(dict.Select(i => new IniEntry(i.Key, i.Value.ToString())));
     public void Insert(int zbLine, IniEntry item) => items.Insert(zbLine, item);
-    public bool Remove(string key, bool recurse = false)
+    // just like Pop(key, fallback) we designed before.
+    public bool Remove(string key, out IniValue? val)
     {
-        for (int i = items.Count - 1; i >= 0; i--)
+        // we resume the repeating key filter, so no need to checkout each one.
+        if (Contains(key, out IniEntry e))
         {
-            if (items[i].Key == key)
-                items.RemoveAt(i);
+            val = e.Value;
+            return items.Remove(e);
         }
-        if (recurse && (Parent?.Contains(key, out _) ?? false))
-            Add(key, string.Empty);
-        return !Contains(key, out _);
+        else
+        {
+            val = null;
+            return false;
+        }
     }
     public bool Remove(IniEntry item) => items.Remove(item);
     public void RemoveAt(int zbLine) => items.RemoveAt(zbLine);
     public void Clear() => items.Clear();
-    public bool Contains(string key, out IniEntry item) => (item = items.LastOrDefault(i => i.Key == key) ?? new()).IsPair;
-    /// <summary>
-    /// <para/>Get specific value of key, and remove that entry.
-    /// <para/>May be useful when processing map components.
-    /// </summary>
-    /// <param name="fallback">If key not found, use this instead.</param>
-    public IniValue? Pop(string key, IniValue? fallback = null) {
-        if (Contains(key, out IniEntry e)) {
-            fallback = e.Value;
-            items.Remove(e);
-        }
-        return fallback;
-    }
+    public bool Contains(string key, out IniEntry entry) => (entry = items.LastOrDefault(i => i.Key == key) ?? new()).IsPair;
     /// <summary>
     /// Deep-copy the section given, and self-update.
     /// </summary>

@@ -70,6 +70,7 @@ public class IniDoc : IEnumerable<IniSection>
         Default.Clear();
         foreach (var section in Raw)
         {
+            section.Summary = null;
             var items = section.Items;
             section.Clear();
             section.AddRange(items);

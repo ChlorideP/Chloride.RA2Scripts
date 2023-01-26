@@ -46,6 +46,8 @@ public static class IniSerializer
                             _ = doc.Contains(curSect[1], out super);
                             super = super ?? new(curSect[1]);
                         }
+                        else super = null;
+
                         self = new(curSect[0], curDesc, super);
                         doc.Add(self);
                     }

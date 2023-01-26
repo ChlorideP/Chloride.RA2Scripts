@@ -61,14 +61,17 @@ public static class IniSerializer
                         var pair = strip.Split('=', 2);
                         pair[0] = pair[0].Trim();
 
-                        var key = pair[0] == "+" ? $"+{doc.Diff++}" : pair[0];
-                        var val = pair[1].Split(';', 2)[0];
-                        var value = val.Trim();
-                        var desc = string.IsNullOrEmpty(value) ? pair[1] : new StringBuilder(pair[1])
-                            .Replace(value.ToString(), string.Empty, 0, val.Length)
-                            .ToString();
+                        if (!pair[0].Contains(';'))
+                        {
+                            var key = pair[0] == "+" ? $"+{doc.Diff++}" : pair[0];
+                            var val = pair[1].Split(';', 2)[0];
+                            var value = val.Trim();
+                            var desc = string.IsNullOrEmpty(value) ? pair[1] : new StringBuilder(pair[1])
+                                .Replace(value.ToString(), string.Empty, 0, val.Length)
+                                .ToString();
 
-                        self!.Add(key, value, desc);
+                            self!.Add(key, value, desc);
+                        }
                     }
                     break;
             }

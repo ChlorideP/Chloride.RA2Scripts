@@ -12,7 +12,7 @@ public struct IniValue
 
     public static bool operator ==(IniValue v1, IniValue v2) => v1.raw == v2.raw;
     public static bool operator !=(IniValue v1, IniValue v2) => v1.raw != v2.raw;
-    public static IniValue operator +(IniValue v1, IniValue v2) => v1.raw + v2.raw;
+    public static IniValue operator +(IniValue v1, IniValue v2) => v1.raw + ',' + v2.raw;
 
     public bool IsNull => string.IsNullOrEmpty(raw);
 

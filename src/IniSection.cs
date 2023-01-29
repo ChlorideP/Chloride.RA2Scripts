@@ -44,8 +44,8 @@ public class IniSection : IEnumerable<IniEntry>, IComparable<IniSection>
 
     public IniValue this[string key]
     {
-        get => !(Contains(key, out IniEntry i) || (Parent?.Contains(key, out i) ?? false))
-            ? throw new KeyNotFoundException(key) : i.Value;
+        get => Contains(key, out IniEntry i, true)
+            ? i.Value : throw new KeyNotFoundException(key);
         set => Add(key, value);
     }
 
@@ -74,30 +74,24 @@ public class IniSection : IEnumerable<IniEntry>, IComparable<IniSection>
     /// </summary>
     /// <param name="recursive">To confirm its Parent. (won't do anything however)</param>
     /// <returns>true if not found anymore, otherwise false.</returns>
-    public bool Remove(string key, bool recursive = false)
-    {
-        bool ret = true;
-        if (Contains(key, out IniEntry e))
-            ret = items.Remove(e);
-        else if (recursive)
-        {
-            for (var parent = Parent; parent != null && parent.Count > 0; parent = parent?.Parent)
-                if (parent.Contains(key, out _))
-                {
-                    ret = false;
-                    break;
-                }
-        } 
-        return ret;
-    }
-    // => Contains(key, out IniEntry e)
-    //     ? items.Remove(e)
-    //     // there may be several sections inherited from the Parent, so don't try to remove outside this.
-    //     : recursive && !(Parent?.Contains(key, out _) ?? false);
+    public bool Remove(string key, bool recursive = false) => Contains(key, out IniEntry e, recursive) ? items.Remove(e) : false;
     public bool Remove(IniEntry item) => items.Remove(item);
     public void RemoveAt(int zbLine) => items.RemoveAt(zbLine);
     public void Clear() => items.Clear();
-    public bool Contains(string key, out IniEntry entry) => (entry = items.LastOrDefault(i => i.Key == key) ?? new()).IsPair;
+    public bool Contains(string key, out IniEntry entry, bool recursive = false)
+    {
+        var found = false;
+        var sect = this;
+        do
+        {
+            found = (entry = sect.items.FindLast(i => i.Key == key) ?? new()).IsPair;
+            if (found) { break; }
+            sect = sect.Parent;
+        }
+        while (recursive && sect != null && sect.Count > 0);
+        return found;
+    }
+
     /// <summary>
     /// Deep-copy the section given, and self-update.
     /// </summary>

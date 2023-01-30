@@ -36,8 +36,9 @@ public static class Common
     public static List<FileInfo> TryGetIncludes(string root)
     {
         T Pop<T>(List<T> lst, int index = -1) {
-            var ret = lst.Last();
-            lst.RemoveAt(index >= 0 ? index : lst.Count + index);
+            index = index >= 0 ? index : lst.Count + index;
+            var ret = lst[index];
+            lst.RemoveAt(index);
             return ret;
         }
 

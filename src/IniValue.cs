@@ -16,8 +16,8 @@ public struct IniValue
 
     public bool IsNull => string.IsNullOrEmpty(raw);
 
-    public T? ConvertTo<T>() => raw is null ? default : (T)Convert.ChangeType(raw, typeof(T));
-    public bool ConvertTo() => !string.IsNullOrEmpty(raw)
+    public T ConvertTo<T>() where T: struct => IsNull ? default : (T)Convert.ChangeType(raw, typeof(T));
+    public bool ConvertTo() => !IsNull
         && ((new char[] { 'y', 't', '1' }).Contains(char.ToLower(raw[0]))
         || ((new char[] { 'n', 'f', '0' }).Contains(char.ToLower(raw[0]))
         ? false : throw new FormatException($"{raw} is not bool")));

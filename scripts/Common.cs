@@ -11,14 +11,8 @@ public static class Common
     public static IniDoc InitIni(string path)
     {
         IniDoc ret = new();
-        FileInfo fi = new(path);
-        ret.Deserialize(fi);
-        // 只读一层捏。不会真有人套娃 [#include] 罢？
-        ret.Deserialize(
-            ret.GetTypeList("#include")
-            .Select(i => new FileInfo(Path.Combine(fi.DirectoryName!, i)))
-            .Where(i => i.Exists)
-            .ToArray());
+        var paths = TryGetIncludes(path);
+        ret.Deserialize(paths.ToArray());
         return ret;
     }
 

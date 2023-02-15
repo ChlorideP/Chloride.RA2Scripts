@@ -26,54 +26,47 @@ public static class IniSerializer
             var line = tr.ReadLine();
             var strip = line?.Trim();
 
-            if (string.IsNullOrEmpty(strip))
+            if (string.IsNullOrEmpty(strip) || strip.StartsWith(';'))
             {
-                self!.Add();
+                self!.Add(line);
                 continue;
             }
 
-            switch (strip.First())
+            if (strip.StartsWith('['))
             {
-                case '[':
-                    var sect = strip.Split(';', 2);
-                    var curSect = sect.First().Split(':').Select(i => i.Trim()[1..^1]).ToArray();
-                    var curDesc = sect.ElementAtOrDefault(1);
+                var sect = strip.Split(';', 2);
+                var curSect = sect.First().Split(':').Select(i => i.Trim()[1..^1]).ToArray();
+                var curDesc = sect.ElementAtOrDefault(1);
 
-                    if (!doc.Contains(curSect[0], out self))
-                    {
-                        if (curSect.Length > 1)
-                        {
-                            _ = doc.Contains(curSect[1], out super);
-                            super = super ?? new(curSect[1]);
-                        }
-                        else super = null;
+                if (doc.Contains(curSect[0], out self))
+                    continue;
 
-                        self = new(curSect[0], curDesc, super);
-                        doc.Add(self);
-                    }
-                    break;
-                case ';':
-                    self!.Add(line);
-                    break;
-                default:
-                    if (strip.Contains('='))
-                    {
-                        var pair = strip.Split('=', 2);
-                        pair[0] = pair[0].Trim();
+                if (curSect.Length > 1)
+                {
+                    _ = doc.Contains(curSect[1], out super);
+                    super ??= new(curSect[1]);
+                }
+                else super = null;
 
-                        if (!pair[0].Contains(';'))
-                        {
-                            var key = pair[0] == "+" ? $"+{doc.Diff++}" : pair[0];
-                            var val = pair[1].Split(';', 2)[0];
-                            var value = val.Trim();
-                            var desc = string.IsNullOrEmpty(value) ? pair[1] : new StringBuilder(pair[1])
-                                .Replace(value.ToString(), string.Empty, 0, val.Length)
-                                .ToString();
+                self = new(curSect[0], curDesc, super);
+                doc.Add(self);
+            }
+            else if (strip.Contains('='))
+            {
+                var pair = strip.Split('=', 2);
+                pair[0] = pair[0].Trim();
 
-                            self!.Add(key, value, desc);
-                        }
-                    }
-                    break;
+                if (pair[0].Contains(';'))
+                    continue;
+
+                var key = pair[0] == "+" ? $"+{doc.Diff++}" : pair[0];
+                var val = pair[1].Split(';', 2)[0];
+                var value = val.Trim();
+                var desc = string.IsNullOrEmpty(value) ? pair[1] : new StringBuilder(pair[1])
+                    .Replace(value, string.Empty, 0, val.Length)
+                    .ToString();
+
+                self!.Add(key, value, desc);
             }
         }
 

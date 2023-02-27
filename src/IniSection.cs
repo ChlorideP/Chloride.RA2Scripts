@@ -55,7 +55,6 @@ public class IniSection : IEnumerable<IniEntry>, IComparable<IniSection>
     public IEnumerable<string> Values => items.Where(i => !string.IsNullOrEmpty(i.Key)).Select(i => i.Value);
     public Dictionary<string, IniValue> Items => items.Where(i => !string.IsNullOrEmpty(i.Key)).ToDictionary(i => i.Key, i => new IniValue(i.Value));
 
-    internal void Add(IniEntry entry) => items.Add(entry);
     public void Add(string? desc = null) => items.Add(new(desc: desc));
     public void Add<T>(string key, T value, string? desc = null) where T : notnull
     {

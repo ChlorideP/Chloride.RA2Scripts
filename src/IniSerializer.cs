@@ -17,42 +17,23 @@ public static class IniSerializer
         }
     }
 
-    /*
-    Without considering git, INI should be very easy though.
-
-    However, sometimes we may want to batch something, with ini structure still kept.
-    Otherwise every thing goes a mess, which is unable to realize what we have done.
-
-    That's why I implement this library. The more to consider, the lower efficiency.
-    */
     public static void Deserialize(IniDoc doc, TextReader tr)
     {
-        IniSection? self = doc.Default;
+        IniSection? self = doc.Default, super = null;
 
         while (tr.Peek() > 0)
         {
             var line = tr.ReadLine();
             var strip = line?.Trim();
 
-            // "; Comment"
-            // "\n"
-            // "                ; Comment"
             if (string.IsNullOrEmpty(strip) || strip.StartsWith(';'))
             {
                 self!.Add(line);
                 continue;
             }
 
-            // [S]
-            // [S]:[P]
-            // [S]:[P]:[GP] // may be invalid in game, just consider Parent right here.
-            // [S]      ;Comment
-            // [S]:[P]  ;Comment
-            // Hint: wouldn't consider the white-spaces in section declaration comments - they're not the most.
             if (strip.StartsWith('['))
             {
-                IniSection? super = null;
-
                 var sect = strip.Split(';', 2);
                 var curSect = sect.First().Split(':').Select(i => i.Trim()[1..^1]).ToArray();
                 var curDesc = sect.ElementAtOrDefault(1);
@@ -65,16 +46,11 @@ public static class IniSerializer
                     _ = doc.Contains(curSect[1], out super);
                     super ??= new(curSect[1]);
                 }
+                else super = null;
 
                 self = new(curSect[0], curDesc, super);
                 doc.Add(self);
             }
-
-            // k=v
-            // k2=v2   ; desc
-            // k3;=v3   // invalid
-            // k4=;v4
-            // k5=     ; v5
             else if (strip.Contains('='))
             {
                 var pair = strip.Split('=', 2);
@@ -83,18 +59,14 @@ public static class IniSerializer
                 if (pair[0].Contains(';'))
                     continue;
 
-                var value = pair[1].Split(';', 2)[0];
-                StringBuilder desc = new(pair[1]);
+                var key = pair[0] == "+" ? $"+{doc.Diff++}" : pair[0];
+                var val = pair[1].Split(';', 2)[0];
+                var value = val.Trim();
+                var desc = string.IsNullOrEmpty(value) ? pair[1] : new StringBuilder(pair[1])
+                    .Replace(value, string.Empty, 0, val.Length)
+                    .ToString();
 
-                IniEntry entry = new(
-                    key: pair[0] == "+" ? $"+{doc.Diff++}" : pair[0],
-                    val: value.Trim()
-                );
-                entry.Comment = string.IsNullOrEmpty(entry.Value)
-                    ? desc.ToString()
-                    : desc.Replace(entry.Value, string.Empty, 0, value.Length).ToString();
-
-                self!.Add(entry);
+                self!.Add(key, value, desc);
             }
         }
 

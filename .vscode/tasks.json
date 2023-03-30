@@ -7,33 +7,21 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/scripts/Scripts.csproj",
+                "${workspaceFolder}/Chloride.RA2.IniExt.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "publish",
+            "label": "build-release",
             "command": "dotnet",
             "type": "process",
             "args": [
-                "publish",
-                "${workspaceFolder}/scripts/Scripts.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "watch",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "watch",
-                "run",
-                "--project",
-                "${workspaceFolder}/scripts/Scripts.csproj"
+                "build",
+                "${workspaceFolder}/Chloride.RA2.IniExt.csproj",
+                "-c",
+                "Release"
             ],
             "problemMatcher": "$msCompile"
         }

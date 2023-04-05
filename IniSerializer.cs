@@ -30,7 +30,9 @@ public static class IniSerializer
             var strip = line?.Trim();
 
             if (string.IsNullOrEmpty(strip) || strip.StartsWith(';'))
-                self!.Add(line);
+                self!.Add(
+                    $";{Guid.NewGuid().ToString()[0..8]}",
+                    new() { Comment = line });
             else if (strip.StartsWith('['))
                 self = doc.ParseSection(strip);
             else if (strip.Contains('='))
@@ -56,7 +58,7 @@ public static class IniSerializer
                 super ??= new(curSect[1]);
             }
 
-            self = new(curSect[0], curDesc, super);
+            self = new(curSect[0], super, curDesc);
             doc.Add(self);
         }
 
@@ -100,7 +102,11 @@ public static class IniSerializer
         {
             tw.WriteLine(i.ToString());
             foreach (var j in i)
-                tw.WriteLine(j.ToString(pairing));
+            {
+                if (!j.Key.StartsWith(';'))
+                    tw.Write($"{j.Key}{pairing}{j.Value.Value}");
+                tw.WriteLine(j.Value.Comment);
+            }
         }
     }
 }

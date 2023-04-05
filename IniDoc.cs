@@ -28,11 +28,7 @@ public class IniDoc : IEnumerable<IniSection>
     }
     public string? this[string section, string key]
     {
-        get
-        {
-            try { return this[section][key].ToString(); }
-            catch { return null; }
-        }
+        get => this[section].Contains(key, out IniValue val) ? val.Value : null;
         set => this[section][key] = value;
     }
 
@@ -54,12 +50,12 @@ public class IniDoc : IEnumerable<IniSection>
 
     public void Rename(string _old, string _new)
     {
-        if (Contains(_old, out IniSection? old))
-        {
-            if (_old == _new || Contains(_new, out _))
-                throw new ArgumentException($"Section {_new} already exists");
-            old!.Name = _new;
-        }
+        if (!Contains(_old, out IniSection? old))
+            return;
+
+        if (_old == _new || Contains(_new, out _))
+            throw new ArgumentException($"Section {_new} already exists");
+        old!.Name = _new;
     }
 
     /// <summary>
@@ -69,12 +65,10 @@ public class IniDoc : IEnumerable<IniSection>
     {
         Default.Clear();
         foreach (var section in Raw)
-        {
-            section.Summary = null;
-            var items = section.Items;
-            section.Clear();
-            section.AddRange(items);
-        }
+            section.Update(new(
+                section.Name,
+                section.Items,
+                section.Parent));
     }
 
     /// <summary>

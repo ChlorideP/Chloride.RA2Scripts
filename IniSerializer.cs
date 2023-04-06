@@ -5,6 +5,49 @@ public static class IniSerializer
 {
     static IniSerializer() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
+    /// <summary>
+    /// INI tree Pre-order traversal.
+    /// </summary>
+    /// <returns>A sequence of ini paths. Same as how <c>Ares.DLL</c> reads.</returns>
+    public static List<FileInfo> TryGetIncludes(string root)
+    {
+        static T Pop<T>(List<T> lst, int index = -1)
+        {
+            index = index >= 0 ? index : lst.Count + index;
+            var ret = lst[index];
+            lst.RemoveAt(index);
+            return ret;
+        }
+
+        List<FileInfo> ret = new();
+        List<string> stack = new() { root };
+
+        var rootdir = Path.GetDirectoryName(root);
+
+        while (stack.Count > 0)
+        {
+            FileInfo ini = new(Pop(stack));
+            IniDoc doc = new();
+
+            try
+            {
+                doc.Deserialize(ini);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"!) Unable to open {ini.Name}: {e.ToString().Split(':').First()}");
+                continue;
+            }
+
+            ret.Add(ini);
+
+            if (doc.Contains("#include", out IniSection? inc))
+                stack.AddRange(inc!.Values.Select(i => Path.Combine(rootdir!, i)).Reverse());
+        }
+
+        return ret;
+    }
+
     public static void Deserialize(this IniDoc doc, params FileInfo[] inis)
     {
         foreach (var ini in inis)

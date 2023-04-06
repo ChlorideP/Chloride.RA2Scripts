@@ -41,8 +41,7 @@ public class IniSection : IEnumerable<KeyValuePair<string, IniValue>>, IComparab
 
     public IniValue this[string key]
     {
-        get => Contains(key, out IniValue v, true)
-            ? v : throw new KeyNotFoundException(key);
+        get => Contains(key, out IniValue value, true) ? value : throw new KeyNotFoundException(key);
         set => Add(key, value);
     }
 
@@ -68,21 +67,22 @@ public class IniSection : IEnumerable<KeyValuePair<string, IniValue>>, IComparab
     /// <c>false</c> otherwise, for example, key was found in its Parent(s).
     /// </returns>
     public bool Remove(string key, bool recursive = false)
-        => Contains(key, out _, recursive) ? items.Remove(key) : false;
-    public bool Contains(string key, out IniValue value, bool recursive = false)
+        => Contains(key, out _, recursive) && items.Remove(key);
+
+    public bool Contains(string key, out IniValue value, bool recurse = false)
     {
-        bool found;
         var sect = this;
         do
         {
-            found = sect.items.TryGetValue(key, out value!);
-            if (found)
+            if (sect.items.TryGetValue(key, out value!))
                 break;
             sect = sect.Parent;
         }
-        while (recursive && sect != null && sect.Count > 0);
-        return found;
+        while (recurse && sect?.Count > 0);
+        value ??= new();
+        return sect?.Count > 0;
     }
+
     public void Clear() => items.Clear();
 
     /// <summary>

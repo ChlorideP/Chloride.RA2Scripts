@@ -20,7 +20,7 @@ Ares 是《红色警戒2：尤里的复仇》的扩展平台，它在 ini 方面
 	处理不同子ini时可能要注意，注册表的`+=`项有没有因此重复。
 
 ### 简单的用例
-下面的示例使用了 C# 9.0 的船新特性“顶级语句”，作用是重排动画注册表。
+下面的示例代码作用是重排动画注册表。
 ```C#
 using Chloride.RA2.IniExt;
 
@@ -31,14 +31,13 @@ IniDoc InitIni(FileInfo ini)
 	return ret;
 }
 
-int idx = 0;
-
 var rulesFile = new FileInfo(".\\rulesmd.ini");
 var rules = InitIni(rulesFile);
 rules["Animations"] = new(
 	"Animations",
-	rules.GetTypeList("Animations").Select(i => new IniEntry($"{idx++}", i))
-	);
+	rules.GetTypeList("Animations")
+		.Select((x, i) => new { i, x })
+		.ToDictionary(x => x.i, x => x.x));
 rules.Serialize(rulesFile, "gb2312"); // buxv "ansi".
 ```
 

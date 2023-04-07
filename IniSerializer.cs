@@ -121,10 +121,10 @@ public static class IniSerializer
 
         self.Add(
             pair[0] == "+" ? $"+{doc.Diff++}" : pair[0],
-            value.Trim(),
+            value = value.Trim(),
             string.IsNullOrEmpty(value)
                 ? val.ToString()
-                : val.Replace(value.Trim(), string.Empty, 0, value.Length).ToString()
+                : val.Replace(value, string.Empty, 0, value.Length).ToString()
         );
     }
 

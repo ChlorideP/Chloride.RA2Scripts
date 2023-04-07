@@ -75,12 +75,12 @@ public class IniSection : IEnumerable<KeyValuePair<string, IniValue>>, IComparab
         do
         {
             if (sect.items.TryGetValue(key, out value!))
-                break;
+                return true;
             sect = sect.Parent;
         }
         while (recurse && sect?.Count > 0);
         value ??= new();
-        return sect?.Count > 0;
+        return false;
     }
 
     public void Clear() => items.Clear();

@@ -139,7 +139,7 @@ public static class IniSerializer
     public static void Serialize(IniDoc doc, TextWriter tw, string pairing = "=")
     {
         foreach (var i in doc.Default)
-            tw.WriteLine(i.ToString());
+            tw.WriteLine(i.Value.Comment);
 
         foreach (var i in doc)
         {

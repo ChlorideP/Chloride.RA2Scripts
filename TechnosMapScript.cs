@@ -6,8 +6,10 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 namespace Chloride.RA2Scripts
 {
@@ -47,10 +49,12 @@ namespace Chloride.RA2Scripts
             });
 
         internal static void TechnoTypeRandomReplace(IniDoc doc, string section, string src, IEnumerable<string> dst)
-        {
-            Random rand = new();
-            dst = dst.ToArray();
-            TechnoTypeReplace(doc, section, src, dst.ElementAt(rand.Next(dst.Count()) - 1));
-        }
+            => Replacement(doc, section, val =>
+            {
+                Random rand = new();
+                dst = dst.ToArray();
+                if (val[1] == src)
+                    val[1] = dst.ElementAt(rand.Next(0, dst.Count()));
+            });
     }
 }

@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0; net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Chloride.RA2Scripts</AssemblyName>
+    <RootNamespace>Chloride.RA2Scripts</RootNamespace>
+    <OutputType>Exe</OutputType>
+    <StartupObject>Chloride.RA2Scripts.MainConsole</StartupObject>
+    <ApplicationIcon>clienticon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="clienticon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="config.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

@@ -1,7 +1,15 @@
 ﻿using System.Collections;
 using System.Text;
 
-namespace Chloride.RA2.IniExt;
+namespace Chloride.RA2Scripts.Formats;
+
+public struct IniParentSection
+{
+    public string Name = string.Empty;
+    public IniSection? Instance = null;
+    public IniParentSection() { }
+}
+
 public class IniSection : IEnumerable<KeyValuePair<string, IniValue>>, IComparable<IniSection>
 {
     // Actually it does more finding operation instead of rearrangement.
@@ -13,20 +21,18 @@ public class IniSection : IEnumerable<KeyValuePair<string, IniValue>>, IComparab
     /// <summary>
     /// The section myself inherited from.
     /// </summary>
-    /// <value>
-    /// <para><b>null</b> - Actually have NO base section.</para>
-    /// <para><b>Empty Section</b> - Literally have but CANNOT FIND it.</para>
-    /// <para><b>Non-empty Section</b> - Have one and got found.</para>
-    /// </value>
-
     // Hint: as C# always use heap to create object,
     // should make "this" updated instead of allocating new one otherwise this track will be lost.
-    public IniSection? Parent { get; set; }
+    public IniParentSection Parent { get; set; }
 
     public IniSection(string name, IniSection? parent = null, string? desc = null)
     {
         Name = name;
-        Parent = parent;
+        Parent = new()
+        {
+            Instance = parent,
+            Name = parent?.Name ?? string.Empty
+        };
         Summary = desc;
     }
     public IniSection(
@@ -51,7 +57,13 @@ public class IniSection : IEnumerable<KeyValuePair<string, IniValue>>, IComparab
     public IEnumerable<string> Values => Keys.Select(i => items[i].Value!);
     public IDictionary<string, string?> Items => Keys.ToDictionary(i => i, i => items[i].Value);
 
-    internal void Add(string key, IniValue value) => items.Add(key, value);
+    internal void Add(string key, IniValue value)
+    {
+        if (Contains(key, out _))
+            items[key] = value;
+        else
+            items.Add(key, value);
+    }
     public void Add<T>(string key, T value, string? desc = null) where T : notnull
     {
         if (!Contains(key, out IniValue val))
@@ -76,9 +88,9 @@ public class IniSection : IEnumerable<KeyValuePair<string, IniValue>>, IComparab
         {
             if (sect.items.TryGetValue(key, out value!))
                 return true;
-            sect = sect.Parent;
+            sect = sect.Parent.Instance;
         }
-        while (recurse && sect?.Count > 0);
+        while (recurse && sect?.Parent.Instance is not null);
         value ??= new();
         return false;
     }
@@ -106,7 +118,7 @@ public class IniSection : IEnumerable<KeyValuePair<string, IniValue>>, IComparab
     {
         StringBuilder sb = new();
         sb.Append($"[{Name}]");
-        if (!string.IsNullOrEmpty(Parent?.Name))
+        if (!string.IsNullOrEmpty(Parent.Name))
             sb.Append($":[{Parent.Name}]");
         if (!string.IsNullOrEmpty(Summary))
             sb.Append($";{Summary}");

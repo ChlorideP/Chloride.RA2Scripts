@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33502.453
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chloride.RA2.IniExt", "Chloride.RA2.IniExt.csproj", "{F814CBC7-021D-400A-A315-210A6EFE5C95}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chloride.RA2Scripts", "Chloride.RA2Scripts.csproj", "{F814CBC7-021D-400A-A315-210A6EFE5C95}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

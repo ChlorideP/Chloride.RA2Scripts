@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Chloride.RA2.IniExt;
+namespace Chloride.RA2Scripts.Formats;
 public static class IniSerializer
 {
     static IniSerializer() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -72,7 +72,10 @@ public static class IniSerializer
             var line = tr.ReadLine();
             var strip = line?.Trim();
 
-            if (string.IsNullOrEmpty(strip) || strip.StartsWith(';'))
+            if (string.IsNullOrEmpty(strip))
+                continue;
+
+            if (strip.StartsWith(';'))
                 self!.Add(
                     $";{Guid.NewGuid().ToString()[0..8]}",
                     new() { Comment = line });
@@ -112,6 +115,7 @@ public static class IniSerializer
     {
         var pair = entryLine.Split('=', 2);
         pair[0] = pair[0].Trim();
+        pair[1] = pair[1].Trim();
 
         if (pair[0].Contains(';'))
             return;
@@ -128,15 +132,15 @@ public static class IniSerializer
         );
     }
 
-    public static void Serialize(this IniDoc doc, FileInfo iniFile, string encoding = "utf-8", string pairing = "=")
+    public static void Serialize(this IniDoc doc, FileInfo iniFile, string encoding = "utf-8", string pairing = "=", int blanklines = 1)
     {
         using var fs = iniFile.Open(FileMode.Create, FileAccess.Write, FileShare.Read);
         using StreamWriter sw = new(fs, Encoding.GetEncoding(encoding)); // DON'T forget gb2312, esp. MAP file from FA2.
 
-        Serialize(doc, sw, pairing);
+        Serialize(doc, sw, pairing, blanklines);
     }
 
-    public static void Serialize(IniDoc doc, TextWriter tw, string pairing = "=")
+    public static void Serialize(IniDoc doc, TextWriter tw, string pairing = "=", int blanklines = 1)
     {
         foreach (var i in doc.Default)
             tw.WriteLine(i.Value.Comment);
@@ -150,6 +154,7 @@ public static class IniSerializer
                     tw.Write($"{j.Key}{pairing}{j.Value.Value}");
                 tw.WriteLine(j.Value.Comment);
             }
+            tw.Write(new string('\n', blanklines));
         }
     }
 }

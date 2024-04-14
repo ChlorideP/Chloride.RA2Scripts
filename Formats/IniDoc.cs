@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace Chloride.RA2.IniExt;
+namespace Chloride.RA2Scripts.Formats;
 public class IniDoc : IEnumerable<IniSection>
 {
     // place here to support "+=" in multiple inis.
@@ -68,7 +68,7 @@ public class IniDoc : IEnumerable<IniSection>
             section.Update(new(
                 section.Name,
                 section.Items,
-                section.Parent));
+                section.Parent.Instance));
     }
 
     /// <summary>

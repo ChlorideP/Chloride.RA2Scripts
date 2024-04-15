@@ -5,3 +5,10 @@
 
 ## Chloride.RA2.IniExt
 现已移入`Chloride.RA2Scripts.Formats`，提供对 INI 文件的逻辑结构解析。
+
+[原 IniExt 库简介](IniExt.ReadMe.md)  
+[原 IniExt 库框架](IniExt.Framework.md)
+
+> 注意：  
+> 现在`master`分支上的 INI 实现与旧版不完全一致，**如只需 IniExt 请以`v3.0.1.3`为准。**  
+> 如需**食用脚本，则需要自行编译**。

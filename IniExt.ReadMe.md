@@ -1,5 +1,5 @@
 # Chloride.RA2.IniExt
-此类库用于处理带注释 Ares INI，同时是[PyMapRA2](https://github.com/Chloride1/PyMapRA2)项目中`relertpy.ccini`模块的扩展（原本只读键值对嘛）。
+此类库用于处理带注释 Ares INI，同时是[pyalert2yr](https://github.com/ClLab-YR/pyalert2yr)项目中`formats.ini`模块的扩展（原本只读键值对嘛）。
 
 ### 为何是 Ares INI？
 
@@ -20,7 +20,7 @@ Ares 是《红色警戒2：尤里的复仇》的扩展平台，它在 ini 方面
 	处理不同子ini时可能要注意，注册表的`+=`项有没有因此重复。
 
 ### 简单的用例
-下面的示例代码作用是重排动画注册表。
+下面的示例代码把 INI 读进内存，并重新保存为`GB2312`编码。
 ```C#
 using Chloride.RA2.IniExt;
 
@@ -33,16 +33,8 @@ IniDoc InitIni(FileInfo ini)
 
 var rulesFile = new FileInfo(".\\rulesmd.ini");
 var rules = InitIni(rulesFile);
-rules["Animations"] = new(
-	"Animations",
-	rules.GetTypeList("Animations")
-		.Select((x, i) => new { i, x })
-		.ToDictionary(x => x.i, x => x.x));
 rules.Serialize(rulesFile, "gb2312"); // buxv "ansi".
 ```
-
-### 复杂的用例
-参见`Scripts`项目。
 
 ### 其他用法
 作为模块导入 PowerShell Core 也是可以的。**注意不是 Windows PowerShell！**  

@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Chloride.RA2.IniExt.csproj",
+                "${workspaceFolder}/Chloride.RA2Scripts.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Chloride.RA2.IniExt.csproj",
+                "${workspaceFolder}/Chloride.RA2Scripts.csproj",
                 "-c",
                 "Release"
             ],

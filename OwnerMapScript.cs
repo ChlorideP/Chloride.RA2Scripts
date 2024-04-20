@@ -1,4 +1,5 @@
-﻿using Chloride.RA2Scripts.Formats;
+﻿using Chloride.RA2Scripts.Components;
+using Chloride.RA2Scripts.Formats;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -136,36 +137,27 @@ internal class OwnerMapScript
 
         TechnosMapScript.Replacement(doc, "Actions", tActions =>
         {
-            //# triggerID = actionsCount, (actionID,p1,p2,p3,p4,p5,p6,p7), ...
-            var cnt = int.Parse(tActions[0]);
-            for (int i = 0, k = 1; i < cnt; i++, k += 8)
+            TriggerActions ta = new(tActions);
+            for (; ta.Seekable; ta.Next())
             {
-                var curAID = tActions[k];
-                if (!ActionsWithOwner.TryGetValue(curAID, out int idx))
+                if (!ActionsWithOwner.TryGetValue(ta.CurrentID, out int idx))
                     continue;
-                if (tActions[k + idx] != idxOld.ToString())
+                if (ta.GetCurrentParamX(idx) != idxOld.ToString())
                     continue;
-                tActions[k + idx] = idxNew.ToString();
+                ta.SetCurrentParamX(idx, idxNew.ToString());
             }
         });
 
         TechnosMapScript.Replacement(doc, "Events", tEvents =>
         {
-            //triggerID = eventsCount, (eventID,tag,p1), (eventID,tag,p1,[optional p2]), ...
-            var cnt = int.Parse(tEvents[0]);  // ec
-            for (int i = 0, k = 1; i < cnt; i++)
+            TriggerEvents te = new(tEvents);
+            for (; te.Seekable; te.Next())
             {
-                var curEID = tEvents[k]; // eid
-                var specialTag = int.Parse(tEvents[++k]); // tag
-                if (EventsWithOwner.TryGetValue(curEID, out int idx) && tEvents[k + idx] == idxOld.ToString())
-                {
-                    tEvents[k + idx] = idxNew.ToString();
-                }
-                k += specialTag switch
-                {
-                    2 => 3,
-                    _ => 2,
-                };
+                if (!EventsWithOwner.TryGetValue(te.CurrentID, out int idx))
+                    continue;
+                if (te.GetCurrentParamX(idx) != idxOld.ToString())
+                    continue;
+                te.SetCurrentParamX(idx, idxNew.ToString());
             }
         });
 

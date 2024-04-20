@@ -9,7 +9,7 @@ namespace Chloride.RA2Scripts
 {
     public static class MainConsole
     {
-        private static IniDoc Config = new();
+        private static readonly IniDoc Config = new();
         internal static IniSection Arguments = Config.Default; 
 
         static MainConsole()
@@ -20,7 +20,7 @@ namespace Chloride.RA2Scripts
             Config.Deserialize(new FileInfo(path));
         }
 
-        public static IniValue GetArgument(string key)
+        public static IniValue GetArg(string key)
         {
             _ = Arguments.Contains(key, out IniValue ret);
             return ret;
@@ -28,13 +28,12 @@ namespace Chloride.RA2Scripts
 
         public static void Main(string[] args)
         {
-            var file = new FileInfo(GetArgument("FilePath").Value);
+            var file = new FileInfo(GetArg("FilePath").ToString());
             var doc = ReadIni(file);
-            TechnosMapScript.TechnoTypeRandomReplace(
+            new OwnerMapScript(Config).TransferOwnerReference(
                 doc,
-                GetArgument("Section").Value,
-                GetArgument("Src").Value,
-                GetArgument("Dst").Split());
+                GetArg("Old").ToString(),
+                GetArg("New").ToString());
             doc.Serialize(file);
         }
 

@@ -23,7 +23,7 @@ namespace Chloride.RA2Scripts
      */
     internal static class TechnosMapScript
     {
-        private static void Replacement(IniDoc doc, string section, Action<string[]> action)
+        internal static void Replacement(IniDoc doc, string section, Action<string[]> action)
         {
             if (!doc.Contains(section, out IniSection? sect))
                 return;

@@ -2,9 +2,9 @@
 
 namespace Chloride.RA2Scripts.Utils
 {
-    internal static class IniUtils
+    public static class IniUtils
     {
-        internal static void ReplaceValue(IniDoc doc, string section, Action<string[]> action)
+        public static void IterateValue(IniDoc doc, string section, Action<IniValue> action, bool overwrite = false)
         {
             if (!doc.Contains(section, out IniSection? sect))
                 return;
@@ -12,11 +12,19 @@ namespace Chloride.RA2Scripts.Utils
             {
                 if (i.Key.StartsWith(';'))  // comments
                     continue;
-                var val = i.Value.Split();
+                IniValue val = i.Value;
                 action.Invoke(val);
-                sect[i.Key] = IniValue.Join(val);
+                if (overwrite)
+                    sect[i.Key] = val;
             }
         }
+        public static void ReplaceValue(IniDoc doc, string section, Action<string[]> action)
+            => IterateValue(doc, section, val =>
+            {
+                var seq = val.Split();
+                action.Invoke(seq);
+                val = IniValue.Join(seq);
+            }, true);
 
         public static IniDoc ReadIni(FileInfo file, bool include = false)
         {

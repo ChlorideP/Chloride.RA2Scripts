@@ -13,7 +13,6 @@ namespace Chloride.RA2Scripts
      */
     internal static class TechnosMapScript
     {
-
         internal static void FootTypeStatusReplace(IniDoc doc, string section, int index, string status, string? owner = null)
             => IniUtils.ReplaceValue(doc, section, val =>
             {

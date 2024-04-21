@@ -1,4 +1,5 @@
 ﻿using Chloride.RA2Scripts.Formats;
+using Chloride.RA2Scripts.Utils;
 
 namespace Chloride.RA2Scripts
 {
@@ -6,18 +7,10 @@ namespace Chloride.RA2Scripts
     {
         internal static void ShowReferredTrigger(IniDoc doc)
         {
-            if (!doc.Contains("CellTags", out IniSection? celltags))
-                return;
             var refs = new HashSet<string>();
-            foreach (var i in celltags!)
-            {
-                refs.Add(i.Value.ToString());
-            }
-
+            IniUtils.IterateValue(doc, "CellTags", val => refs.Add(val.ToString()));
             foreach (var i in refs)
-            {
                 Console.WriteLine($"{i} - {doc["Tags"][i]}");
-            }
         }
     }
 }

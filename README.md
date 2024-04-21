@@ -1,14 +1,15 @@
 # Chloride.RA2Scripts
-дЩ`pyalert2yr`�ﲻ���㼯�ɵĹ��߽ű�����Ȼ�Ǳ�Ҳ�и�`docs/samples.md`����֮�����ο���
+写些`pyalert2yr`里不方便集成的工具脚本。当然那边也有个`docs/samples.md`，总之仅供参考。
 
-> `Shimakaze.Sdk`ò�Ʋ�û����Ϊ��Ƕ��������Ŀ����ƣ����Ҿ�ֻ���Լ���һ���ˡ�
+> `Shimakaze.Sdk`貌似并没有作为库嵌入其他项目的设计，那我就只好自己搓一个了。
+
+> 如需食用脚本，还请部署`.net 6.0 SDK`**自行编译**，并自行在项目目录重建`config.ini`。
 
 ## Chloride.RA2.IniExt
-��������`Chloride.RA2Scripts.Formats`���ṩ�� INI �ļ����߼��ṹ������
+现已移入`Chloride.RA2Scripts.Formats`，提供对 INI 框架的扩展解析。
 
-[ԭ IniExt ����](IniExt.ReadMe.md)  
-[ԭ IniExt ����](IniExt.Framework.md)
+[原 IniExt 库简介](IniExt.ReadMe.md)  
+[原 IniExt 库框架](IniExt.Framework.md)
 
-> ע�⣺  
-> ����`master`��֧�ϵ� INI ʵ����ɰ治��ȫһ�£�**��ֻ�� IniExt ����`v3.0.1.3`Ϊ׼��**  
-> ����**ʳ�ýű�������Ҫ���б���**��
+> 注意：  
+> 现在`master`分支上的 INI 实现与旧版不完全一致，**如只需 IniExt 请以`v3.0.1.3`为准。**  

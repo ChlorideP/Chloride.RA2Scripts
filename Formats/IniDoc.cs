@@ -8,6 +8,9 @@ public class IniDoc : IEnumerable<IniSection>
 
     public IniDoc() { }
 
+    /// <summary>
+    /// The header of INI document, doesn't belong to any sections.
+    /// </summary>
     public IniSection Default { get; } = new("; Default");
     private List<IniSection> Raw { get; set; } = new();
 
@@ -82,6 +85,8 @@ public class IniDoc : IEnumerable<IniSection>
 
     public bool Contains(string sectionName, out IniSection? section)
         => (section = Raw.FirstOrDefault(i => i.Name == sectionName)) != null;
+    public bool ContainsKey(string sectionName, string key) =>
+        Contains(sectionName, out IniSection? sect) && sect!.Contains(key, out _);
 
     public string[] GetTypeList(string sect) => Contains(sect, out IniSection? ret)
         ? ret!.Values.Where(i => !string.IsNullOrEmpty(i)).Distinct().ToArray()

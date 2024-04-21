@@ -4,7 +4,10 @@ namespace Chloride.RA2Scripts.Utils
 {
     public static class IniUtils
     {
-        public static void IterateValue(IniDoc doc, string section, Action<IniValue> action, bool overwrite = false)
+        /// <summary>
+        /// Hint: Dictionary keys are readonly and not able to override.
+        /// </summary>
+        public static void IteratePairs(IniDoc doc, string section, Action<string, IniValue> action, bool overrideValue = false)
         {
             if (!doc.Contains(section, out IniSection? sect))
                 return;
@@ -13,13 +16,13 @@ namespace Chloride.RA2Scripts.Utils
                 if (i.Key.StartsWith(';'))  // comments
                     continue;
                 IniValue val = i.Value;
-                action.Invoke(val);
-                if (overwrite)
+                action.Invoke(i.Key, val);
+                if (overrideValue)
                     sect[i.Key] = val;
             }
         }
         public static void ReplaceValue(IniDoc doc, string section, Action<string[]> action)
-            => IterateValue(doc, section, val =>
+            => IteratePairs(doc, section, (key, val) =>
             {
                 var seq = val.Split();
                 action.Invoke(seq);

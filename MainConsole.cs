@@ -6,7 +6,7 @@ namespace Chloride.RA2Scripts
     public static class MainConsole
     {
         private static readonly IniDoc Config = new();
-        internal static IniSection Arguments = Config.Default;
+        private static IniSection Arguments = Config.Default;
 
         static MainConsole()
         {
@@ -19,10 +19,7 @@ namespace Chloride.RA2Scripts
         {
             var file = new FileInfo(GetArg("FilePath").ToString());
             var doc = IniUtils.ReadIni(file);
-            new OwnerMapScript(Config).TransferOwnerReference(
-                doc,
-                GetArg("Old").ToString(),
-                GetArg("New").ToString());
+            new TriggerMapScript(Arguments).CheckoutNullReferences(doc);
             doc.Serialize(file);
         }
 

@@ -6,28 +6,41 @@ namespace Chloride.RA2Scripts;
 internal class OwnerMapScript
 {
     /// <summary>
-    /// Key for ID, Value for house param index.
+    /// <para/>Key for ID, Value for house param index.
+    /// <para/>Since actions are perfectly aligned (all have 7 params),
+    /// the TriggerAction wrapper would consider p1 just as param.
     /// </summary>
     internal Dictionary<string, int> ActionsWithOwner = new();
+    /// <summary>
+    /// <para/>Key for ID, Value for house param index.
+    /// <para/>Unlike the actions, events would have to take p1 as param tag,
+    /// so right here the index actually begins from p2.
+    /// </summary>
     internal Dictionary<string, int> EventsWithOwner = new();
-    internal List<string> ScriptsWithOwner = new();
+    internal HashSet<string> ScriptsWithOwner = new();
 
+    /// <summary>
+    /// <para/>You have to instantiate these scripts for loading external data:
+    /// <list type="bullet">
+    /// <item>INI key <c>ExtOwnerScripts</c></item>
+    /// <item>INI section <c>ExtOwnerEvents</c></item>
+    /// <item>INI section <c>ExtOwnerActions</c></item>
+    /// </list>
+    /// <para/>Hint: INI keys above should be placed in the head of config,
+    /// without included in any sections of it.
+    /// </summary>
     internal OwnerMapScript(IniDoc config)
     {
         _ = config.Default.Contains("ExtOwnerScripts", out IniValue extScripts);
-        ScriptsWithOwner = ScriptsWithOwner.Union(extScripts.Split()).ToList();
+        ScriptsWithOwner = ScriptsWithOwner.Union(extScripts.Split()).ToHashSet();
 
         _ = config.Contains("ExtOwnerEvents", out IniSection? extEvents);
         foreach (var i in extEvents ?? new(string.Empty))
-        {
             EventsWithOwner.Add(i.Key, i.Value.Convert<int>());
-        }
 
         _ = config.Contains("ExtOwnerActions", out IniSection? extActions);
         foreach (var i in extActions ?? new(string.Empty))
-        {
             ActionsWithOwner.Add(i.Key, i.Value.Convert<int>());
-        }
     }
 
     /* step 1: check out alliance （TODO

@@ -1,15 +1,5 @@
 ﻿using Chloride.RA2Scripts.Formats;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Collections.Specialized.BitVector32;
+using Chloride.RA2Scripts.Utils;
 
 namespace Chloride.RA2Scripts
 {
@@ -23,33 +13,23 @@ namespace Chloride.RA2Scripts
      */
     internal static class TechnosMapScript
     {
-        internal static void Replacement(IniDoc doc, string section, Action<string[]> action)
-        {
-            if (!doc.Contains(section, out IniSection? sect))
-                return;
-            foreach (var i in sect!.Keys)
-            {
-                var val = sect[i].Split();
-                action.Invoke(val);
-                sect[i] = IniValue.Join(val);
-            }
-        }
+
         internal static void FootTypeStatusReplace(IniDoc doc, string section, int index, string status, string? owner = null)
-            => Replacement(doc, section, val =>
+            => IniUtils.ReplaceValue(doc, section, val =>
             {
                 if (owner == null || val[0] == owner)
                     val[index] = status;
             });
 
         internal static void TechnoTypeReplace(IniDoc doc, string section, string src, string dst)
-            => Replacement(doc, section, val =>
+            => IniUtils.ReplaceValue(doc, section, val =>
             {
                 if (val[1] == src)
                     val[1] = dst;
             });
 
         internal static void TechnoTypeRandomReplace(IniDoc doc, string section, string src, IEnumerable<string> dst)
-            => Replacement(doc, section, val =>
+            => IniUtils.ReplaceValue(doc, section, val =>
             {
                 Random rand = new();
                 dst = dst.ToArray();

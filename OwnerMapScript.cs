@@ -1,10 +1,6 @@
 ﻿using Chloride.RA2Scripts.Components;
 using Chloride.RA2Scripts.Formats;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Chloride.RA2Scripts.Utils;
 
 namespace Chloride.RA2Scripts;
 internal class OwnerMapScript
@@ -103,28 +99,28 @@ internal class OwnerMapScript
             team["House"] = _new;
         }
 
-        TechnosMapScript.Replacement(doc, "Triggers", triggerinfo =>
+        IniUtils.ReplaceValue(doc, "Triggers", triggerinfo =>
         {
             if (triggerinfo[0] == old)
                 triggerinfo[0] = _new;
         });
 
-        TechnosMapScript.Replacement(doc, "Infantry", techno =>
+        IniUtils.ReplaceValue(doc, "Infantry", techno =>
         {
             if (techno[0] == h_old)
                 techno[0] = h_new;
         });
-        TechnosMapScript.Replacement(doc, "Units", techno =>
+        IniUtils.ReplaceValue(doc, "Units", techno =>
         {
             if (techno[0] == h_old)
                 techno[0] = h_new;
         });
-        TechnosMapScript.Replacement(doc, "Aircraft", techno =>
+        IniUtils.ReplaceValue(doc, "Aircraft", techno =>
         {
             if (techno[0] == h_old)
                 techno[0] = h_new;
         });
-        TechnosMapScript.Replacement(doc, "Structures", techno =>
+        IniUtils.ReplaceValue(doc, "Structures", techno =>
         {
             if (techno[0] == h_old)
                 techno[0] = h_new;
@@ -135,7 +131,7 @@ internal class OwnerMapScript
         var idxOld = Array.IndexOf(houses, h_old);
         var idxNew = Array.IndexOf(houses, h_new);
 
-        TechnosMapScript.Replacement(doc, "Actions", tActions =>
+        IniUtils.ReplaceValue(doc, "Actions", tActions =>
         {
             TriggerActions ta = new(tActions);
             for (; ta.Seekable; ta.Next())
@@ -148,7 +144,7 @@ internal class OwnerMapScript
             }
         });
 
-        TechnosMapScript.Replacement(doc, "Events", tEvents =>
+        IniUtils.ReplaceValue(doc, "Events", tEvents =>
         {
             TriggerEvents te = new(tEvents);
             for (; te.Seekable; te.Next())
@@ -163,7 +159,7 @@ internal class OwnerMapScript
 
         foreach (var i in doc.GetTypeList("ScriptTypes"))
         {
-            TechnosMapScript.Replacement(doc, i, cur =>
+            IniUtils.ReplaceValue(doc, i, cur =>
             {
                 if (cur.Length < 2)
                     return;

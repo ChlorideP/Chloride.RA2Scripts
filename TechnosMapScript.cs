@@ -58,5 +58,22 @@ namespace Chloride.RA2Scripts
         // random HP.fscript
         internal static void TechnoRandomHP(IniDoc doc, string section)
             => IniUtils.ReplaceValue(doc, section, val => val[HealthIndex] = Randomizer.Next(0, 256).ToString());
+
+        internal static void InhibitCapturable(IniDoc doc, IEnumerable<string> todoList, IniDoc? mergedRules = null, bool recurse = false)
+        {
+            if (!doc.Contains("Structures", out IniSection? buildings))
+                return;
+            var presets = buildings!.Values.Select(i => i.Split(',')[TechnoTypeIndex]).ToHashSet();
+            foreach (var i in todoList)
+            {
+                if (!presets.Contains(i))
+                    continue;
+                if (mergedRules == null || (mergedRules.ContainsKey(i, "Capturable", recurse) && mergedRules[i]["Capturable"].Convert())) // capturable def to false.
+                {
+                    doc.Add(i);
+                    doc[i]["Capturable"] = false;
+                }
+            }
+        }
     }
 }

@@ -19,7 +19,12 @@ namespace Chloride.RA2Scripts
         {
             var file = new FileInfo(GetArg("FilePath").ToString());
             var doc = IniUtils.ReadIni(file);
-            new TriggerMapScript(Arguments).CheckoutNullReferences(doc);
+            var rulesdoc = IniUtils.ReadIni(new(GetArg("RootRulesPath").ToString()), GetArg("ReadIncludes").Convert());
+            TechnosMapScript.InhibitCapturable(
+                doc,
+                InfoFetchIniScript.GetFactoryBuildings(rulesdoc).Union(InfoFetchIniScript.GetSuperWeaponBuildings(rulesdoc)),
+                rulesdoc,
+                GetArg("ReadInherits").Convert());
             doc.Serialize(file);
         }
 

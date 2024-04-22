@@ -90,7 +90,7 @@ public class IniSection : IEnumerable<KeyValuePair<string, IniValue>>, IComparab
                 return true;
             sect = sect.Parent.Instance;
         }
-        while (recurse && sect?.Parent.Instance is not null);
+        while (recurse && sect is not null);
         value ??= new();
         return false;
     }

@@ -85,8 +85,8 @@ public class IniDoc : IEnumerable<IniSection>
 
     public bool Contains(string sectionName, out IniSection? section)
         => (section = Raw.FirstOrDefault(i => i.Name == sectionName)) != null;
-    public bool ContainsKey(string sectionName, string key) =>
-        Contains(sectionName, out IniSection? sect) && sect!.Contains(key, out _);
+    public bool ContainsKey(string sectionName, string key, bool recurse = false) =>
+        Contains(sectionName, out IniSection? sect) && sect!.Contains(key, out _, recurse);
 
     public string[] GetTypeList(string sect) => Contains(sect, out IniSection? ret)
         ? ret!.Values.Where(i => !string.IsNullOrEmpty(i)).Distinct().ToArray()

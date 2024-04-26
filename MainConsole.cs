@@ -1,4 +1,4 @@
-﻿using Chloride.RA2Scripts.Formats;
+using Chloride.RA2Scripts.Formats;
 using Chloride.RA2Scripts.Utils;
 
 namespace Chloride.RA2Scripts
@@ -31,6 +31,8 @@ namespace Chloride.RA2Scripts
         public static IniValue GetArg(string key)
         {
             _ = Arguments.Contains(key, out IniValue ret);
+            if (ret.Value?.StartsWith('~') ?? false)  // for unix shell
+                ret.Value = ret.Value.Replace("~", $"/home/{Environment.UserName}");
             return ret;
         }
     }

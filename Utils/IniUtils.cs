@@ -5,9 +5,10 @@ namespace Chloride.RA2Scripts.Utils
     public static class IniUtils
     {
         /// <summary>
-        /// Hint: Dictionary keys are readonly and not able to override.
+        /// Hint: Dictionary keys are readonly and not able to override,
+        /// and you could update <c>IniValue.Value</c> to override Dictionary values.
         /// </summary>
-        public static void IteratePairs(IniDoc doc, string section, Action<string, IniValue> action, bool overrideValue = false)
+        public static void IteratePairs(IniDoc doc, string section, Action<string, IniValue> action)
         {
             if (!doc.Contains(section, out IniSection? sect))
                 return;
@@ -17,8 +18,6 @@ namespace Chloride.RA2Scripts.Utils
                     continue;
                 IniValue val = i.Value;
                 action.Invoke(i.Key, val);
-                if (overrideValue)
-                    sect[i.Key] = val;
             }
         }
         public static void ReplaceValue(IniDoc doc, string section, Action<string[]> action)
@@ -26,8 +25,8 @@ namespace Chloride.RA2Scripts.Utils
             {
                 var seq = val.Split();
                 action.Invoke(seq);
-                val = IniValue.Join(seq);
-            }, true);
+                val.Value = string.Join(',', seq);
+            });
 
         public static IniDoc ReadIni(FileInfo file, bool include = false)
         {

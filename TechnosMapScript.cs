@@ -22,9 +22,11 @@ namespace Chloride.RA2Scripts
 
         internal static Random Randomizer = new(114514);
 
-        internal static void FootTypeStatusReplace(IniDoc doc, string section, string status, string? owner = null)
+        internal static void FootTypeStatusReplace(IniDoc doc, string section, string status, string? owner = null, string? techno = null)
             => IniUtils.ReplaceValue(doc, section, val =>
             {
+                if (techno != null && val[TechnoTypeIndex] != techno)
+                    return;
                 if (owner == null || val[0] == owner)
                     val[FootTypeMissionIndex] = status;
             });

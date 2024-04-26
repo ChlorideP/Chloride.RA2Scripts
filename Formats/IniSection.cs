@@ -110,6 +110,8 @@ public class IniSection : IEnumerable<KeyValuePair<string, IniValue>>, IComparab
         items = section.ToDictionary(i => i.Key, i => i.Value);
     }
 
+    internal void Update(IEnumerable<KeyValuePair<string, IniValue>> pairs) => items = pairs.ToDictionary(i => i.Key, i => i.Value);
+
     public int CompareTo(IniSection? other) => Name.CompareTo(other?.Name);
     public IEnumerator<KeyValuePair<string, IniValue>> GetEnumerator() => items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();

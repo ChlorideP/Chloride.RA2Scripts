@@ -95,6 +95,26 @@ internal class OwnerMapScript
     }
 
     /// <summary>
+    /// <para/>Just copy the IQ, Color, Spawned aircrafts direction, etc.
+    /// <para/>Right here you need to input "XX House" instead of just "XX",
+    /// as the abstract countries wouldn't be accessible for players.
+    /// </summary>
+    internal static void TransferOwnerConfigs(IniDoc doc, string old, string _new)
+    {
+        if (!doc.Contains(old, out IniSection? oldsect) || !doc.Contains(_new, out IniSection? newsect))
+            return;
+        doc[_new, "IQ"] = doc[old, "IQ"];
+        doc[_new, "Edge"] = doc[old, "Edge"];
+        doc[_new, "Color"] = doc[old, "Color"];
+        doc[_new, "PlayerControl"] = doc[old, "PlayerControl"];
+        if (doc[_new].Contains("PlayerControl", out IniValue pc) && pc.Convert())
+        {
+            doc[_new, "NodeCount"] = 0.ToString();
+            doc[_new].Update(doc[_new].Where(i => !int.TryParse(i.Key, out _)));
+        }
+    }
+
+    /// <summary>
     /// No need to input "XX House", just "XX".
     /// </summary>
     internal void TransferOwnerReference(IniDoc doc, string old, string _new)

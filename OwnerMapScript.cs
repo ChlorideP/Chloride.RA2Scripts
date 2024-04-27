@@ -83,14 +83,7 @@ internal class OwnerMapScript
                 continue;
             if (!doc.Contains(i, out IniSection? iHouse))
                 continue;
-            var iRelationships = iHouse!["Allies"].Split();
-            for (int j = 0; j < iRelationships.Length; j++)
-            {
-                if (iRelationships[j] != old)
-                    continue;
-                iRelationships[j] = _new;
-                break;
-            }
+            iHouse!["Allies"].Value = iHouse!["Allies"].Value?.Replace(old, _new);
         }
     }
 

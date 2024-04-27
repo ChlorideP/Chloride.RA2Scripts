@@ -26,8 +26,8 @@
             seek += 8;
         }
         public string CurrentID => raw[seek];
-        public string GetCurrentParamX(int paramOrder) => raw[seek + paramOrder];
-        public void SetCurrentParamX(int paramOrder, string val) => raw[seek + paramOrder] = val;
+        public string GetCurParamX(int paramOrder) => raw[seek + paramOrder];
+        public void SetCurParamX(int paramOrder, string val) => raw[seek + paramOrder] = val;
         public override string ToString() => string.Join(',', raw);
     }
 }

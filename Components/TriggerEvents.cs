@@ -31,8 +31,8 @@
         }
         public string CurrentID => raw[seek];
         public int CurrentParamTag => int.Parse(raw[seek + 1]);  // real p1
-        public string GetCurrentParamX(int paramOrder) => raw[seek + paramOrder + 1];  // actually p2, or p3
-        public void SetCurrentParamX(int paramOrder, string val) => raw[seek + paramOrder + 1] = val;
+        public string GetCurParamX(int paramOrder) => raw[seek + paramOrder + 1];  // actually p2, or p3
+        public void SetCurParamX(int paramOrder, string val) => raw[seek + paramOrder + 1] = val;
         public override string ToString() => string.Join(',', raw);
     }
 }

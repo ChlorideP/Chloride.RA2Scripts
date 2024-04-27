@@ -23,6 +23,10 @@ namespace Chloride.RA2Scripts
                 ActionsWithTriggerParam = ActionsWithTriggerParam.Union(ext.Split()).ToHashSet();
         }
 
+        /// <summary>
+        /// <para/>To find out null references of triggers, as FA2 wouldn't warn you.
+        /// <para/>i.e. You deleted a trigger initially disabled, yet another one still try to enable it.
+        /// </summary>
         internal void CheckoutNullReferences(IniDoc doc) => IniUtils.IteratePairs(doc, "Actions", (key, val) =>
         {
             /* TActions may have the following properties in game: 
@@ -37,7 +41,7 @@ namespace Chloride.RA2Scripts
             {
                 if (!ActionsWithTriggerParam.Contains(ta.CurrentID))
                     continue;
-                var triggerid = ta.GetCurrentParamX(2);
+                var triggerid = ta.GetCurParamX(2);
                 if (doc.ContainsKey("Triggers", triggerid))
                     continue;
                 Console.WriteLine($"Found null trigger reference {triggerid} in {key}");

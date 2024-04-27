@@ -1,6 +1,7 @@
 ﻿using Chloride.RA2Scripts.Components;
 using Chloride.RA2Scripts.Formats;
 using Chloride.RA2Scripts.Utils;
+using static Chloride.RA2Scripts.Constants;
 
 namespace Chloride.RA2Scripts;
 internal class OwnerMapScript
@@ -43,8 +44,8 @@ internal class OwnerMapScript
             ActionsWithOwner.Add(i.Key, i.Value.Convert<int>());
     }
 
-    /* step 1: check out alliance （TODO
-     * step 2: check out easy refs （Done
+    /* step 1: check out alliance
+     * step 2: check out easy refs
      *  - 2.1 teams (House=
      *  - 2.2 triggers (string[0])
      *  - 2.3 technos (string[0])
@@ -55,7 +56,8 @@ internal class OwnerMapScript
      */
 
     /// <summary>
-    /// No need to input "XX House", just "XX".
+    /// <para/>To keep original relationships if you want to.
+    /// <para/>Hint: No need to input "XX House", just "XX".
     /// </summary>
     internal static void TransferOwnerAlliance(IniDoc doc, string old, string _new)
     {
@@ -108,7 +110,13 @@ internal class OwnerMapScript
     }
 
     /// <summary>
-    /// No need to input "XX House", just "XX".
+    /// <para/>To replace all old occurrence with the new, like
+    /// <list type="bullet">
+    /// <item/>Team house
+    /// <item/>Trigger (house, Events param, Actions param)
+    /// <item/>Techno owner (Infantry, Units, etc)
+    /// </list>
+    /// <para/>Hint: No need to input "XX House", just "XX".
     /// </summary>
     internal void TransferOwnerReference(IniDoc doc, string old, string _new)
     {
@@ -127,29 +135,29 @@ internal class OwnerMapScript
 
         IniUtils.ReplaceValue(doc, "Triggers", triggerinfo =>
         {
-            if (triggerinfo[0] == old)
-                triggerinfo[0] = _new;
+            if (triggerinfo[HouseIndex] == old)
+                triggerinfo[HouseIndex] = _new;
         });
 
         IniUtils.ReplaceValue(doc, "Infantry", techno =>
         {
-            if (techno[0] == h_old)
-                techno[0] = h_new;
+            if (techno[HouseIndex] == h_old)
+                techno[HouseIndex] = h_new;
         });
         IniUtils.ReplaceValue(doc, "Units", techno =>
         {
-            if (techno[0] == h_old)
-                techno[0] = h_new;
+            if (techno[HouseIndex] == h_old)
+                techno[HouseIndex] = h_new;
         });
         IniUtils.ReplaceValue(doc, "Aircraft", techno =>
         {
-            if (techno[0] == h_old)
-                techno[0] = h_new;
+            if (techno[HouseIndex] == h_old)
+                techno[HouseIndex] = h_new;
         });
         IniUtils.ReplaceValue(doc, "Structures", techno =>
         {
-            if (techno[0] == h_old)
-                techno[0] = h_new;
+            if (techno[HouseIndex] == h_old)
+                techno[HouseIndex] = h_new;
         });
 
         // by int args
@@ -164,9 +172,9 @@ internal class OwnerMapScript
             {
                 if (!ActionsWithOwner.TryGetValue(ta.CurrentID, out int idx))
                     continue;
-                if (ta.GetCurrentParamX(idx) != idxOld.ToString())
+                if (ta.GetCurParamX(idx) != idxOld.ToString())
                     continue;
-                ta.SetCurrentParamX(idx, idxNew.ToString());
+                ta.SetCurParamX(idx, idxNew.ToString());
             }
         });
 
@@ -177,15 +185,15 @@ internal class OwnerMapScript
             {
                 if (!EventsWithOwner.TryGetValue(te.CurrentID, out int idx))
                     continue;
-                if (te.GetCurrentParamX(idx) != idxOld.ToString())
+                if (te.GetCurParamX(idx) != idxOld.ToString())
                     continue;
-                te.SetCurrentParamX(idx, idxNew.ToString());
+                te.SetCurParamX(idx, idxNew.ToString());
             }
         });
 
         foreach (var i in doc.GetTypeList("ScriptTypes"))
         {
-            IniUtils.ReplaceValue(doc, i, cur =>
+            IniUtils.ReplaceValue(doc, i, cur => // scriptid, scriptparam
             {
                 if (cur.Length < 2)
                     return;

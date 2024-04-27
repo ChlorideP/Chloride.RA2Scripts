@@ -1,25 +1,11 @@
 ﻿using Chloride.RA2Scripts.Formats;
 using Chloride.RA2Scripts.Utils;
-using System;
+using static Chloride.RA2Scripts.Constants;
 
 namespace Chloride.RA2Scripts
 {
-    /*
-    # [Infantry]
-    # INDEX = OWNER, ID, HEALTH, X, Y, SUB_CELL, MISSION, FACING, TAG, VETERANCY, GROUP, HIGH, AUTOCREATE_NO_RECRUITABLE, AUTOCREATE_YES_RECRUITABLE
-    # [Units]
-    # INDEX = OWNER, ID, HEALTH, X, Y, FACING, MISSION, TAG, VETERANCY, GROUP, HIGH, FOLLOWS_INDEX, AUTOCREATE_NO_RECRUITABLE, AUTOCREATE_YES_RECRUITABLE
-    # [Aircraft]
-    # INDEX = OWNER, ID, HEALTH, X, Y, FACING, MISSION, TAG, VETERANCY, GROUP, AUTOCREATE_NO_RECRUITABLE, AUTOCREATE_YES_RECRUITABLE
-    # [Structures]
-    # INDEX = OWNER,ID,HEALTH,X,Y,FACING,TAG,AI_SELLABLE,AI_REBUILDABLE,POWERED_ON,UPGRADES,SPOTLIGHT,UPGRADE_1,UPGRADE_2,UPGRADE_3,AI_REPAIRABLE,NOMINAL
-     */
     internal static class TechnosMapScript
     {
-        internal const int FootTypeMissionIndex = 6;
-        internal const int TechnoTypeIndex = 1;
-        internal const int HealthIndex = 2;
-
         internal static Random Randomizer = new(114514);
 
         internal static void FootTypeStatusReplace(IniDoc doc, string section, string status, string? owner = null, string? techno = null)
@@ -27,7 +13,7 @@ namespace Chloride.RA2Scripts
             {
                 if (techno != null && val[TechnoTypeIndex] != techno)
                     return;
-                if (owner == null || val[0] == owner)
+                if (owner == null || val[HouseIndex] == owner)
                     val[FootTypeMissionIndex] = status;
             });
 
@@ -61,6 +47,11 @@ namespace Chloride.RA2Scripts
         internal static void TechnoRandomHP(IniDoc doc, string section)
             => IniUtils.ReplaceValue(doc, section, val => val[HealthIndex] = Randomizer.Next(0, 256).ToString());
 
+        /// <summary>
+        /// Lazy Ini writer for preventing engineers capturing specific buildings.
+        /// </summary>
+        /// <param name="mergedRules">If not <c>null</c>, it would first search the building type in <c>mergedRules</c>, to consider if necessary to write.</param>
+        /// <param name="recurse">If <c>true</c>, it would do recursive search in <c>mergedRules</c>, since Ares supports section inheritance.</param>
         internal static void InhibitCapturable(IniDoc doc, IEnumerable<string> todoList, IniDoc? mergedRules = null, bool recurse = false)
         {
             if (!doc.Contains("Structures", out IniSection? buildings))

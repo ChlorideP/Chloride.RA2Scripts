@@ -90,35 +90,33 @@ internal class OwnerMapScript
     }
 
     /// <summary>
-    /// <para/>Just copy the IQ, Color, Spawned aircrafts direction, etc.
-    /// <para/>Right here you need to input "XX House" instead of just "XX",
-    /// as the abstract countries wouldn't be accessible for players.
+    /// Just copy the IQ, Color, Spawned aircrafts direction, etc.
     /// </summary>
-    internal static void TransferOwnerConfigs(IniDoc doc, string old, string _new)
+    internal static void TransferOwnerConfigs(IniDoc doc, string oldHouse, string newHouse)
     {
-        if (!doc.Contains(old, out IniSection? oldsect) || !doc.Contains(_new, out IniSection? newsect))
+        if (!doc.Contains(oldHouse, out IniSection? oldsect) || !doc.Contains(newHouse, out IniSection? newsect))
             return;
-        doc[_new, "IQ"] = doc[old, "IQ"];
-        doc[_new, "Edge"] = doc[old, "Edge"];
-        doc[_new, "Color"] = doc[old, "Color"];
-        doc[_new, "PlayerControl"] = doc[old, "PlayerControl"];
-        if (doc[_new].Contains("PlayerControl", out IniValue pc) && pc.Convert())
+        doc[newHouse, "IQ"] = doc[oldHouse, "IQ"];
+        doc[newHouse, "Edge"] = doc[oldHouse, "Edge"];
+        doc[newHouse, "Color"] = doc[oldHouse, "Color"];
+        doc[newHouse, "PlayerControl"] = doc[oldHouse, "PlayerControl"];
+        if (doc[newHouse].Contains("PlayerControl", out IniValue pc) && pc.Convert())
         {
-            doc[_new, "NodeCount"] = 0.ToString();
-            doc[_new].Update(doc[_new].Where(i => !int.TryParse(i.Key, out _)));
+            doc[newHouse, "NodeCount"] = 0.ToString();
+            doc[newHouse].Update(doc[newHouse].Where(i => !int.TryParse(i.Key, out _)));
         }
     }
 
     /// <summary>
-    /// <para/>To replace all old occurrence with the new, like
+    /// <para/>To replace all old house STRING occurrence with the new, like
     /// <list type="bullet">
     /// <item/>Team house
-    /// <item/>Trigger (house, Events param, Actions param)
-    /// <item/>Techno owner (Infantry, Units, etc)
+    /// <item/>Trigger house
+    /// <item/>Techno (Infantry, Units, etc) owner
     /// </list>
     /// <para/>Hint: No need to input "XX House", just "XX".
     /// </summary>
-    internal void TransferOwnerReference(IniDoc doc, string old, string _new)
+    internal static void TransferOwnerStringRefs(IniDoc doc, string old, string _new)
     {
         var h_old = $"{old} House";
         var h_new = $"{_new} House";
@@ -159,12 +157,28 @@ internal class OwnerMapScript
             if (techno[HouseIndex] == h_old)
                 techno[HouseIndex] = h_new;
         });
+    }
 
+    /// <summary>
+    /// To replace all old house INDEXES with the new,
+    /// like Events, Actions or Scripts house parameter(s).
+    /// </summary>
+    internal void TransferOwnerIntRefs(IniDoc doc, string oldHouse, string newHouse)
+    {
         // by int args
         var houses = doc.GetTypeList("Houses");
-        var idxOld = Array.IndexOf(houses, h_old);
-        var idxNew = Array.IndexOf(houses, h_new);
+        var idxOld = Array.IndexOf(houses, oldHouse);
+        var idxNew = Array.IndexOf(houses, newHouse);
 
+        TransferOwnerIntRefs(doc, idxOld, idxNew);
+    }
+
+    /// <summary>
+    /// To replace all old house INDEXES with the new,
+    /// like Events, Actions or Scripts house parameter(s).
+    /// </summary>
+    internal void TransferOwnerIntRefs(IniDoc doc, int idxOld, int idxNew)
+    {
         IniUtils.ReplaceValue(doc, "Actions", tActions =>
         {
             TriggerActions ta = new(tActions);

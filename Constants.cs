@@ -17,5 +17,8 @@ public static class Constants
     internal const int HouseIndex = 0;
 
     public const string BuildingTypes = nameof(BuildingTypes);
+    public const string InfantryTypes = nameof(InfantryTypes);
+    public const string VehicleTypes = nameof(VehicleTypes);
+    public const string AircraftTypes = nameof(AircraftTypes);
     public const string SuperWeapon = nameof(SuperWeapon);
 }

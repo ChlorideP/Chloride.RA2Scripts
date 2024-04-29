@@ -35,5 +35,15 @@ namespace Chloride.RA2Scripts.Utils
             ret.Deserialize(paths.Where(i => i.Exists).ToArray());
             return ret;
         }
+
+        public static void ResortTypeList(this IniDoc doc, string typeName)
+        {
+            var tlist = doc.GetTypeList(typeName);
+            if (!doc.Contains(typeName, out IniSection? sect))
+                return;
+            sect!.Clear();  // lazy to filter comments, just clean all.
+            for (int i = 0; i < tlist.Length; i++)
+                sect.Add(i.ToString(), tlist[i]);
+        }
     }
 }

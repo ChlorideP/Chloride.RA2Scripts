@@ -1,4 +1,4 @@
-using Chloride.RA2Scripts.Formats;
+﻿using Chloride.RA2Scripts.Formats;
 using Chloride.RA2Scripts.Utils;
 
 namespace Chloride.RA2Scripts
@@ -19,12 +19,7 @@ namespace Chloride.RA2Scripts
         {
             var file = new FileInfo(GetArg("FilePath").ToString());
             var doc = IniUtils.ReadIni(file);
-            var rulesdoc = IniUtils.ReadIni(new(GetArg("RootRulesPath").ToString()), GetArg("ReadIncludes").Convert());
-            TechnosMapScript.InhibitCapturable(
-                doc,
-                InfoFetchIniScript.GetFactoryBuildings(rulesdoc).Union(InfoFetchIniScript.GetSuperWeaponBuildings(rulesdoc)),
-                rulesdoc,
-                GetArg("ReadInherits").Convert());
+            doc.ResortTypeList(GetArg("TypeList").ToString());
             doc.Serialize(file);
         }
 
